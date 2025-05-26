@@ -9,10 +9,10 @@ source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
 source("/home/bastian/GitHub/TopKGraphs/R/calc_BINARY.R")
 
 # Varianz 
-my_var <- 1
+my_var <- 0.1
 VVV <- c(0.1,0.5,1,5,10,15,20)
 this_method = "ward.D"
-max.k = 10
+max.k = 7
 fix.k = NaN
 
 omics  <- sim1(FALSE, my_var, mode="HC")
@@ -46,4 +46,39 @@ res = topkgraphs(omics_binary)
 
 hc = hclust(as.dist(res), method="ward.D")
 
+
+# BASIC PLOT 
 plot(hc)
+
+
+## PLOT WITH DENDEXTEND
+library(dendextend)
+
+# Convert hclust to dendrogram
+dend <- as.dendrogram(hc)
+
+# Customize appearance
+dend <- dend %>%
+  set("branches_k_color", k = 3) %>%  # color branches by cluster
+  set("branches_lwd", 2) %>%
+  set("labels_cex", 0.7)
+
+# Plot
+plot(dend, main = "Enhanced Dendrogram with dendextend")
+
+
+
+
+## PLOT WITH GGDENDRO
+library(ggdendro)
+
+# Convert to dendrogram and then to ggplot
+ggd <- as.dendrogram(hc)
+ggd_data <- dendro_data(ggd)
+
+# Plot
+library(ggplot2)
+ggplot(segment(ggd_data)) +
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) +
+  theme_minimal() +
+  labs(title = "Dendrogram (ggplot2)", x = "", y = "Height")
