@@ -51,6 +51,11 @@ hc = hclust(as.dist(res), method="ward.D")
 plot(hc)
 
 
+
+#### ADVANCED PLOTS
+###############################################
+
+
 ## PLOT WITH DENDEXTEND
 library(dendextend)
 

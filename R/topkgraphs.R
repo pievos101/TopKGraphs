@@ -136,6 +136,7 @@ for(xx in 1:length(na_cols)){
    repl_val =  setdiff(values, rankMatrix[, na_cols[xx]])
    if(length(repl_val)==0){next}
    repl_ids = which(rankMatrix[,na_cols[xx]]=="NaN")
+   if(length(repl_ids)==0){next}
    #print(repl_val)
    #print("start")
    #print(na_cols[xx])
