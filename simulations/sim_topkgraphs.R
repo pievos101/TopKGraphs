@@ -65,11 +65,11 @@ dend <- as.dendrogram(hc)
 # Customize appearance
 dend <- dend %>%
   set("branches_k_color", k = 3) %>%  # color branches by cluster
-  set("branches_lwd", 2) %>%
-  set("labels_cex", 0.7)
+  set("branches_lwd", 3) %>%
+  set("labels_cex", 1)
 
 # Plot
-plot(dend, main = "Enhanced Dendrogram with dendextend")
+plot(dend, main = "Fused Dendrogram of the Graphs")
 
 
 
