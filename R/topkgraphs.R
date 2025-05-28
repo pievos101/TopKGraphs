@@ -30,7 +30,7 @@ for (xx in 1:length(RES)){
 DIST = DIST/max(DIST, na.rm=TRUE)
 DIST[is.na(DIST)] = 1
 
-return(DIST)
+return(list(RES=RES, DIST=DIST))
 
 }
 

@@ -44,7 +44,7 @@ source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
 
 res = topkgraphs(omics_binary)
 
-hc = hclust(as.dist(res), method="ward.D")
+hc = hclust(as.dist(res$DIST), method="ward.D")
 
 
 # BASIC PLOT 
