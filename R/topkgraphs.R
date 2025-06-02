@@ -5,7 +5,12 @@ library(igraph)
 topkgraphs <- function(views, walk_depth=20, n_iter=20){
 
  RES = list()
- n_nodes = nrow(views[[1]])
+ 
+ if(!(is(views[[1]])[1]=="igraph")){
+    n_nodes = nrow(views[[1]])
+ }else{
+    n_nodes = length(V(views[[1]]))
+ }
 
  cat("The graph has", n_nodes, "Nodes. \n")
  for(xx in 1:n_nodes){
@@ -44,15 +49,19 @@ for(ii in 1:length(views)){
 
     adjmatrix = views[[ii]]
 
-    # Convert to graph object
-    graph = graph_from_adjacency_matrix(
-    adjmatrix,
-    mode = "undirected",
-    weighted = NULL,
-    diag = FALSE,
-    add.colnames = NULL,
-    add.rownames = NA
-    )
+    if(!(is(adjmatrix)[1]=="igraph")){
+        # Convert to graph object
+        graph = graph_from_adjacency_matrix(
+        adjmatrix,
+        mode = "undirected",
+        weighted = NULL,
+        diag = FALSE,
+        add.colnames = NULL,
+        add.rownames = NA
+        )
+    }else{
+        graph = adjmatrix
+    }
 
     WALKS = matrix(NaN, walk_depth + 1, n_iter)
 
@@ -88,9 +97,9 @@ res1 = apply(WALKS, 2, table, simplify=FALSE)
 res2 = sapply(res1, sort, decreasing=TRUE, simplify=FALSE)
 
 #print(res2)
-
-n_nodes = max(as.numeric(unlist(sapply(res2, names))))
-
+#@FIXME ?? - this should be fixed now
+#n_nodes = max(as.numeric(unlist(sapply(res2, names))))
+n_nodes = length(unique(as.numeric(unlist(sapply(res2, names)))))
 #print(n_nodes)
 #print(ncol(WALKS))
 
@@ -102,6 +111,7 @@ for (xx in 1:ncol(WALKS)){
     rankMatrix[1:length(res2[[xx]]),xx] = names(res2[[xx]])
 
 }
+
 #print(rankMatrix)
 
 # check missings
@@ -112,6 +122,8 @@ na_cols = na_ids[,2]
 for(xx in 1:length(na_cols)){
 
    repl_val =  setdiff(values, rankMatrix[, na_cols[xx]])
+   #print(rankMatrix[, na_cols[xx]])
+   #print(repl_val)
    if(length(repl_val)==0){next}
    repl_ids = which(rankMatrix[,na_cols[xx]]=="NaN")
    if(length(repl_ids)==0){next}
