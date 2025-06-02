@@ -30,42 +30,53 @@ nodes_per_community <- 10
 intra_prob <- 0.8   # Probability of connection within communities
 inter_prob <- 0.02  # Probability of connection between communities
 
-# Generate the graph
-g <- sample_islands(num_communities, 
-                    nodes_per_community, 
-                    5/10, 
-                    1)
 
-# Plot the graph
-plot(g, vertex.color = membership(cluster_label_prop(g)), 
-     vertex.label = NA, vertex.size = 6, 
-     main = "Graph with Known Community Structure")
+n_iter = 50 
 
+RES = matrix(NaN, n_iter, 2)
+colnames(RES) = c("TopKGraphs", "Jaccard")
 
+for(xx in 1:n_iter){
 
-res = topkgraphs(list(g), walk_depth=3, n_iter=20)
-topkgraphs_sim = 1 - res$DIST
+    # Generate the graph
+    g <- sample_islands(num_communities, 
+                        nodes_per_community, 
+                        5/10, 
+                        3)
 
-jaccard_sim <- similarity(g, method = "jaccard", mode = "all")
-
-hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D")
-cl_topkgraphs = cutree(hc_topkgraphs,4)
-
-hc_jaccard = hclust(as.dist(1-jaccard_sim), method="ward.D")
-cl_jaccard = cutree(hc_jaccard,4)
-
-library(aricode)
-membership_gt <- rep(1:num_communities, each = nodes_per_community)
-
-ari_topkgraphs = ARI(membership_gt, cl_topkgraphs)
-ari_jaccard = ARI(membership_gt, cl_jaccard)
-
-print(ari_topkgraphs)
-print(ari_jaccard)
+    # Plot the graph
+    plot(g, vertex.color = membership(cluster_label_prop(g)), 
+        vertex.label = NA, vertex.size = 6, 
+        main = "Graph with Known Community Structure")
 
 
+    res = topkgraphs(list(g), walk_depth=5, n_iter=20)
+    topkgraphs_sim = 1 - res$DIST
 
-################### PLOTS ###############################
+    jaccard_sim <- similarity(g, method = "jaccard", mode = "all")
+
+    hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D")
+    cl_topkgraphs = cutree(hc_topkgraphs,4)
+
+    hc_jaccard = hclust(as.dist(1-jaccard_sim), method="ward.D")
+    cl_jaccard = cutree(hc_jaccard,4)
+
+    library(aricode)
+    membership_gt <- rep(1:num_communities, each = nodes_per_community)
+
+    ari_topkgraphs = ARI(membership_gt, cl_topkgraphs)
+    ari_jaccard = ARI(membership_gt, cl_jaccard)
+
+    RES[xx,1] = ari_topkgraphs
+    RES[xx,2] = ari_jaccard
+
+print(RES)
+}
+
+stop("All good. finished!")
+
+##################################################################
+################### PLOTS ########################################
 # BASIC PLOT 
 plot(hc)
 
