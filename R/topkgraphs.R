@@ -38,68 +38,46 @@ return(list(RES=RES, DIST=DIST))
 
 topkgraphs_walk <- function(views, start_node=1, walk_depth=20, n_iter=20){
 
-adjmatrix1 = views[[1]]
-adjmatrix2 = views[[2]]
+WALKSALL = list()
 
+for(ii in 1:length(views)){
 
-# Convert to graph object
-graph1 = graph_from_adjacency_matrix(
-  adjmatrix1,
-  mode = "undirected",
-  weighted = NULL,
-  diag = FALSE,
-  add.colnames = NULL,
-  add.rownames = NA
-)
+    adjmatrix = views[[ii]]
 
-# Convert to graph object
-graph2 = graph_from_adjacency_matrix(
-  adjmatrix2,
-  mode = "undirected",
-  weighted = NULL,
-  diag = FALSE,
-  add.colnames = NULL,
-  add.rownames = NA
-)
-
-
-WALKS1 = matrix(NaN, walk_depth + 1, n_iter)
-
-for(xx in 1:n_iter){
-
-    # Generate Random walks
-    list = random_walk(
-    graph1,
-    start_node,
-    walk_depth,
-    mode = "all", #c("out", "in", "all", "total"),
-    stuck = c("return")
+    # Convert to graph object
+    graph = graph_from_adjacency_matrix(
+    adjmatrix,
+    mode = "undirected",
+    weighted = NULL,
+    diag = FALSE,
+    add.colnames = NULL,
+    add.rownames = NA
     )
 
-    list = as.numeric(list)
-    WALKS1[,xx] = list
-}
+    WALKS = matrix(NaN, walk_depth + 1, n_iter)
 
+        for(xx in 1:n_iter){
 
-WALKS2 = matrix(NaN, walk_depth + 1, n_iter)
+            # Generate Random walks
+            list = random_walk(
+            graph,
+            start_node,
+            walk_depth,
+            mode = "all", #c("out", "in", "all", "total"),
+            stuck = c("return")
+            )
 
-for(xx in 1:n_iter){
+            list = as.numeric(list)
+            WALKS[,xx] = list
+        }
 
-    # Generate Random walks
-    list = random_walk(
-    graph2,
-    start_node,
-    walk_depth,
-    mode = "all", #c("out", "in", "all", "total"),
-    stuck = c("return")
-    )
+    WALKSALL[[ii]] = WALKS
 
-    list = as.numeric(list)
-    WALKS2[,xx] = list
-}
+}# End of iterations over graphs
+
 
 # Concatenate the walks from the multi-view graphs
-WALKS = cbind(WALKS1, WALKS2)
+WALKS = Reduce('cbind', WALKSALL) 
 
 #print(WALKS)
 
