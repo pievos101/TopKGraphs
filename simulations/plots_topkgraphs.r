@@ -1,3 +1,20 @@
+## Heatmap
+
+
+# Plot heatmap
+library(pheatmap)
+pheatmap(jaccard_sim,
+         clustering_distance_rows = "euclidean",
+         clustering_distance_cols = "euclidean",
+         color = colorRampPalette(c("white", "blue"))(100),
+         main = "Jaccard Similarity Heatmap (Top 30 Nodes)",
+         fontsize_row = 8,
+         fontsize_col = 8)
+
+
+
+
+
 # Convert to graph object
 graph_fused <- graph_from_adjacency_matrix(
   res,
