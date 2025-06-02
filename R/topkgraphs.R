@@ -157,11 +157,11 @@ if(length(na_rows)!=0){
 # Check the correctness of that! @FIXME
 # BORDA ---------------------------------------- #
 #print("BORDA")
-rankMatrix2 <- apply(rankMatrix,2, function(x) match(1:length(x),x))
+#rankMatrix2 <- apply(rankMatrix,2, function(x) match(1:length(x),x))
 
 #print(rankMatrix2)
 
-rankMatrix2 <- matrix(as.character(rankMatrix2), dim(rankMatrix2)[1],dim(rankMatrix2)[2])
+#rankMatrix2 <- matrix(as.character(rankMatrix2), dim(rankMatrix2)[1],dim(rankMatrix2)[2])
 
 #print(rankMatrix2)
 

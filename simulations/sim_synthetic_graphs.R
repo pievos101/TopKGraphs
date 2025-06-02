@@ -33,8 +33,8 @@ inter_prob <- 0.02  # Probability of connection between communities
 
 n_iter = 50 
 
-RES = matrix(NaN, n_iter, 2)
-colnames(RES) = c("TopKGraphs", "Jaccard")
+RES = matrix(NaN, n_iter, 3)
+colnames(RES) = c("TopKGraphs", "Jaccard", "Dice")
 
 for(xx in 1:n_iter){
 
@@ -45,33 +45,43 @@ for(xx in 1:n_iter){
                         3)
 
     # Plot the graph
-    plot(g, vertex.color = membership(cluster_label_prop(g)), 
-        vertex.label = NA, vertex.size = 6, 
-        main = "Graph with Known Community Structure")
+    #plot(g, vertex.color = membership(cluster_label_prop(g)), 
+    #    vertex.label = NA, vertex.size = 6, 
+    #    main = "Graph with Known Community Structure")
 
 
     res = topkgraphs(list(g), walk_depth=5, n_iter=20)
+
     topkgraphs_sim = 1 - res$DIST
 
     jaccard_sim <- similarity(g, method = "jaccard", mode = "all")
 
+    dice_sim <- similarity(g, method = "dice", mode = "all")
+
     hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D")
-    cl_topkgraphs = cutree(hc_topkgraphs,4)
+    cl_topkgraphs = cutree(hc_topkgraphs, num_communities)
 
     hc_jaccard = hclust(as.dist(1-jaccard_sim), method="ward.D")
-    cl_jaccard = cutree(hc_jaccard,4)
+    cl_jaccard = cutree(hc_jaccard, num_communities)
+
+    hc_dice = hclust(as.dist(1-dice_sim), method="ward.D")
+    cl_dice = cutree(hc_dice, num_communities)
 
     library(aricode)
     membership_gt <- rep(1:num_communities, each = nodes_per_community)
 
     ari_topkgraphs = ARI(membership_gt, cl_topkgraphs)
     ari_jaccard = ARI(membership_gt, cl_jaccard)
+    ari_dice = ARI(membership_gt, cl_dice)
 
     RES[xx,1] = ari_topkgraphs
     RES[xx,2] = ari_jaccard
+    RES[xx,3] = ari_dice
 
 print(RES)
 }
+
+boxplot(RES, ylab="ARI")
 
 stop("All good. finished!")
 
