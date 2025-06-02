@@ -2,7 +2,7 @@ library(TopKLists)
 library(igraph)
 
 
-topkgraphs <- function(views, walk_depth=20, n_iter=20){
+topkgraphs <- function(views, walk_depth=20, n_iter=50){
 
  RES = list()
  

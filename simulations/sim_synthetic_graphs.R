@@ -25,7 +25,7 @@ source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
 
 
 # Parameters
-num_communities <- 4
+num_communities <- 3
 nodes_per_community <- 10
 intra_prob <- 0.8   # Probability of connection within communities
 inter_prob <- 0.02  # Probability of connection between communities
@@ -42,7 +42,7 @@ for(xx in 1:n_iter){
     g <- sample_islands(num_communities, 
                         nodes_per_community, 
                         5/10, 
-                        3)
+                        5)
 
     # Plot the graph
     #plot(g, vertex.color = membership(cluster_label_prop(g)), 
@@ -50,13 +50,13 @@ for(xx in 1:n_iter){
     #    main = "Graph with Known Community Structure")
 
 
-    res = topkgraphs(list(g), walk_depth=5, n_iter=20)
+    res = topkgraphs(list(g), walk_depth=5, n_iter=30)
 
     topkgraphs_sim = 1 - res$DIST
 
-    jaccard_sim <- similarity(g, method = "jaccard", mode = "all")
+    jaccard_sim = similarity(g, method = "jaccard", mode = "all")
 
-    dice_sim <- similarity(g, method = "dice", mode = "all")
+    dice_sim = similarity(g, method = "dice", mode = "all")
 
     hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D")
     cl_topkgraphs = cutree(hc_topkgraphs, num_communities)
@@ -81,12 +81,37 @@ for(xx in 1:n_iter){
 print(RES)
 }
 
-boxplot(RES, ylab="ARI")
+library(ggplot2)
+library(reshape)
+
+RES_melt = melt(RES)
+colnames(RES_melt) = c("ID","Method","Value")
+
+
+ggplot(RES_melt, aes(x = Method, y = Value, fill = Method)) +
+  geom_boxplot(outlier.shape = 21, outlier.fill = "white", outlier.color = "black") +
+  theme_minimal(base_size = 14) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Similarity Scores by Method",
+    y = "Adjusted R-Index (ARI)",
+    x = "Method"
+  ) +
+  theme(legend.position = "none")
+
 
 stop("All good. finished!")
 
 ##################################################################
 ################### PLOTS ########################################
+
+
+
+
+
+
+
+
 # BASIC PLOT 
 plot(hc)
 
