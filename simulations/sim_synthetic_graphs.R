@@ -39,17 +39,37 @@ colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian")
 
 for(xx in 1:n_iter){
 
+    #################################################
     # Generate the graph
-    g <- sample_islands(num_communities, 
-                        nodes_per_community, 
-                        5/10, 
-                        2)
+    #g <- sample_islands(num_communities, 
+    #                    nodes_per_community, 
+    #                    5/10, 
+    #                    2)
 
     # Plot the graph
     #plot(g, vertex.color = membership(cluster_label_prop(g)), 
     #    vertex.label = NA, vertex.size = 6, 
     #    main = "Graph with Known Community Structure")
+    ######################################################
 
+    # Sizes of the communities
+    sizes <- c(10, 10, 10)
+
+    # Connection probability matrix (3x3)
+    pref.matrix <- matrix(c(
+      0.10,  0.05, 0.02,
+      0.05, 0.10, 0.01,
+      0.02, 0.01, 0.20
+    ), nrow = 3, byrow = TRUE)
+
+    # Generate the SBM graph
+    g <- sample_sbm(sum(sizes), pref.matrix, block.sizes = sizes)
+
+    # Assign community membership
+    V(g)$community <- rep(1:length(sizes), times = sizes)
+
+    # Plot with communities
+    #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
     res = topkgraphs(list(g), walk_depth=5, n_iter=20)
 
@@ -90,7 +110,8 @@ for(xx in 1:n_iter){
     #print(cl_node2vec)
 
     library(aricode)
-    membership_gt <- rep(1:num_communities, each = nodes_per_community)
+    #membership_gt <- rep(1:num_communities, each = nodes_per_community)
+    membership_gt = rep(1:length(sizes), times = sizes)
 
     ari_topkgraphs = ARI(membership_gt, cl_topkgraphs)
     ari_jaccard = ARI(membership_gt, cl_jaccard)

@@ -1,4 +1,5 @@
 library(TopKLists)
+library(TopKSignal)
 library(igraph)
 
 
@@ -192,6 +193,8 @@ TKSrank_geomean   <- match(1:length(TKSrank_geomean),as.numeric(TKSrank_geomean)
 #print(length(TKSrank))
 # ---------------------------------------------- #
 
+#rownames(rankMatrix2) = paste("p", 1:nrow(rankMatrix2), sep="")
+#colnames(rankMatrix2) = paste("r", 1:ncol(rankMatrix2), sep="")
 
 #estimatedSignal <- estimateTheta(R.input = rankMatrix2, 
 #                    num.boot = 100, b = 0.1, 
