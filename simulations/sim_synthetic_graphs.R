@@ -35,7 +35,7 @@ inter_prob <- 0.02  # Probability of connection between communities
 n_iter = 50 
 
 RES = matrix(NaN, n_iter, 4)
-colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Node2Vec")
+colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian")
 
 for(xx in 1:n_iter){
 
@@ -59,9 +59,13 @@ for(xx in 1:n_iter){
 
     dice_sim = similarity(g, method = "dice", mode = "all")
 
+    L    =  laplacian_matrix(g, sparse = FALSE)
+    eig  = eigen(L)
+    emb  = eig$vectors#[,1:10]
+
     # Node2Vec
-    edges = get.edgelist(g)
-    emb = node2vecR(edges,p=2,q=1,num_walks=20,walk_length=5,dim=10)
+    #edges = get.edgelist(g)
+    #emb = node2vecR(edges)
     #ids = as.numeric(rownames(emb))
     #ids = match(1:nrow(emb), ids)
     #emb = emb[ids, ]
@@ -75,25 +79,30 @@ for(xx in 1:n_iter){
     hc_dice = hclust(as.dist(1-dice_sim), method="ward.D")
     cl_dice = cutree(hc_dice, num_communities)
 
-    hc_node2vec = hclust(dist(emb), method="ward.D")
-    cl_node2vec = cutree(hc_node2vec, num_communities)
-    ids = as.numeric(names(cl_node2vec))
-    ids = match(1:length(cl_node2vec), ids)
-    cl_node2vec = cl_node2vec[ids]
-    print(cl_node2vec)
-    
+    hc_laplacian = hclust(dist(scale(emb)), method="ward.D")
+    cl_laplacian = cutree(hc_laplacian, num_communities)
+
+    #hc_node2vec = hclust(dist(emb), method="ward.D")
+    #cl_node2vec = cutree(hc_node2vec, num_communities)
+    #ids = as.numeric(names(cl_node2vec))
+    #ids = match(1:length(cl_node2vec), ids)
+    #cl_node2vec = cl_node2vec[ids]
+    #print(cl_node2vec)
+
     library(aricode)
     membership_gt <- rep(1:num_communities, each = nodes_per_community)
 
     ari_topkgraphs = ARI(membership_gt, cl_topkgraphs)
     ari_jaccard = ARI(membership_gt, cl_jaccard)
     ari_dice = ARI(membership_gt, cl_dice)
-    ari_node2vec = ARI(membership_gt, cl_node2vec)
+    ari_laplacian = ARI(membership_gt, cl_laplacian)
+    
+    #ari_node2vec = ARI(membership_gt, cl_node2vec)
 
     RES[xx,1] = ari_topkgraphs
     RES[xx,2] = ari_jaccard
     RES[xx,3] = ari_dice
-    RES[xx,4] = ari_node2vec
+    RES[xx,4] = ari_laplacian
 
 print(RES)
 }

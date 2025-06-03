@@ -192,6 +192,19 @@ TKSrank_geomean   <- match(1:length(TKSrank_geomean),as.numeric(TKSrank_geomean)
 #print(length(TKSrank))
 # ---------------------------------------------- #
 
+
+#estimatedSignal <- estimateTheta(R.input = rankMatrix2, 
+#                    num.boot = 100, b = 0.1, 
+#                    solver = "gurobi",
+#                    #type = "restrictedLinear", 
+#                    type = "restrictedQuadratic", 
+#                    bootstrap.type = "classic.bootstrap",
+#                    nCore = 3)
+
+
+
+#TKSrank_topksignal = rank(-estimatedSignal$estimation$signal.estimate)
+
 return(borda.res)
 
 }
