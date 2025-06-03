@@ -36,6 +36,9 @@ DIST = DIST/max(DIST, na.rm=TRUE)
 DIST[is.na(DIST)] = 1
 diag(DIST) = 0
 
+# Make it symmetric
+DIST = (DIST + t(DIST)) / 2
+
 return(list(RES=RES, DIST=DIST))
 
 }
@@ -64,7 +67,7 @@ for(ii in 1:length(views)){
         graph = adjmatrix
     }
 
-    WALKS = matrix(NaN, walk_depth + 1, n_iter)
+    WALKS = matrix(NaN, walk_depth, n_iter)
 
         for(xx in 1:n_iter){
 
@@ -78,6 +81,8 @@ for(ii in 1:length(views)){
             )
 
             list = as.numeric(list)
+            #print(list)
+            #print(dim(WALKS))
             WALKS[,xx] = list
         }
 

@@ -25,7 +25,7 @@ source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
 
 
 # Parameters
-num_communities <- 3
+num_communities <- 4
 nodes_per_community <- 10
 intra_prob <- 0.8   # Probability of connection within communities
 inter_prob <- 0.02  # Probability of connection between communities
@@ -42,7 +42,7 @@ for(xx in 1:n_iter){
     g <- sample_islands(num_communities, 
                         nodes_per_community, 
                         5/10, 
-                        5)
+                        3)
 
     # Plot the graph
     #plot(g, vertex.color = membership(cluster_label_prop(g)), 
@@ -88,17 +88,18 @@ RES_melt = melt(RES)
 colnames(RES_melt) = c("ID","Method","Value")
 
 
-ggplot(RES_melt, aes(x = Method, y = Value, fill = Method)) +
+p1 = ggplot(RES_melt, aes(x = Method, y = Value, fill = Method)) +
   geom_boxplot(outlier.shape = 21, outlier.fill = "white", outlier.color = "black") +
   theme_minimal(base_size = 14) +
   scale_fill_brewer(palette = "Set2") +
   labs(
-    title = "Similarity Scores by Method",
+    title = "Clustering performance",
     y = "Adjusted R-Index (ARI)",
     x = "Method"
   ) +
   theme(legend.position = "none")
 
+print(p1)
 
 stop("All good. finished!")
 
