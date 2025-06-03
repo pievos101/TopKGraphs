@@ -4,6 +4,7 @@ library(TopKLists)
 library(igraph)
 library(fastcluster) 
 library(cluster) 
+library(node2vec)
 
 source("/home/bastian/GitHub/TopKGraphs/simulations/sim.R")
 source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
@@ -25,7 +26,7 @@ source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
 
 
 # Parameters
-num_communities <- 4
+num_communities <- 3
 nodes_per_community <- 10
 intra_prob <- 0.8   # Probability of connection within communities
 inter_prob <- 0.02  # Probability of connection between communities
@@ -33,8 +34,8 @@ inter_prob <- 0.02  # Probability of connection between communities
 
 n_iter = 50 
 
-RES = matrix(NaN, n_iter, 3)
-colnames(RES) = c("TopKGraphs", "Jaccard", "Dice")
+RES = matrix(NaN, n_iter, 4)
+colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Node2Vec")
 
 for(xx in 1:n_iter){
 
@@ -42,7 +43,7 @@ for(xx in 1:n_iter){
     g <- sample_islands(num_communities, 
                         nodes_per_community, 
                         5/10, 
-                        3)
+                        2)
 
     # Plot the graph
     #plot(g, vertex.color = membership(cluster_label_prop(g)), 
@@ -50,13 +51,20 @@ for(xx in 1:n_iter){
     #    main = "Graph with Known Community Structure")
 
 
-    res = topkgraphs(list(g), walk_depth=5, n_iter=30)
+    res = topkgraphs(list(g), walk_depth=5, n_iter=20)
 
     topkgraphs_sim = 1 - res$DIST
 
     jaccard_sim = similarity(g, method = "jaccard", mode = "all")
 
     dice_sim = similarity(g, method = "dice", mode = "all")
+
+    # Node2Vec
+    edges = get.edgelist(g)
+    emb = node2vecR(edges,p=2,q=1,num_walks=20,walk_length=5,dim=10)
+    #ids = as.numeric(rownames(emb))
+    #ids = match(1:nrow(emb), ids)
+    #emb = emb[ids, ]
 
     hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D")
     cl_topkgraphs = cutree(hc_topkgraphs, num_communities)
@@ -67,16 +75,25 @@ for(xx in 1:n_iter){
     hc_dice = hclust(as.dist(1-dice_sim), method="ward.D")
     cl_dice = cutree(hc_dice, num_communities)
 
+    hc_node2vec = hclust(dist(emb), method="ward.D")
+    cl_node2vec = cutree(hc_node2vec, num_communities)
+    ids = as.numeric(names(cl_node2vec))
+    ids = match(1:length(cl_node2vec), ids)
+    cl_node2vec = cl_node2vec[ids]
+    print(cl_node2vec)
+    
     library(aricode)
     membership_gt <- rep(1:num_communities, each = nodes_per_community)
 
     ari_topkgraphs = ARI(membership_gt, cl_topkgraphs)
     ari_jaccard = ARI(membership_gt, cl_jaccard)
     ari_dice = ARI(membership_gt, cl_dice)
+    ari_node2vec = ARI(membership_gt, cl_node2vec)
 
     RES[xx,1] = ari_topkgraphs
     RES[xx,2] = ari_jaccard
     RES[xx,3] = ari_dice
+    RES[xx,4] = ari_node2vec
 
 print(RES)
 }
