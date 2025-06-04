@@ -57,9 +57,9 @@ for(xx in 1:n_iter){
 
     # Connection probability matrix (3x3)
     pref.matrix <- matrix(c(
-      0.10,  0.05, 0.02,
-      0.05, 0.10, 0.01,
-      0.02, 0.01, 0.20
+      0.20,  0.01, 0.01,
+      0.01, 0.20, 0.01,
+      0.01, 0.01, 0.20
     ), nrow = 3, byrow = TRUE)
 
     # Generate the SBM graph
