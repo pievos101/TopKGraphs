@@ -56,10 +56,13 @@ for(xx in 1:n_iter){
     sizes <- c(10, 10, 10)
 
     # Connection probability matrix (3x3)
+    intra = 0.50
+    inter = 0.25
+
     pref.matrix <- matrix(c(
-      0.50,  0.01, 0.01,
-      0.01, 0.50, 0.01,
-      0.01, 0.01, 0.50
+      intra, inter, inter,
+      inter, intra, inter,
+      inter, inter, intra
     ), nrow = 3, byrow = TRUE)
 
     # Generate the SBM graph
