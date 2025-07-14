@@ -55,6 +55,7 @@ for(xx in 1:n_iter){
 
     # Sizes of the communities
     sizes <- c(10, 10, 10)
+    n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
     intra = 0.20
@@ -123,9 +124,9 @@ for(xx in 1:n_iter){
     #hc_node2vec = hclust(dist(emb), method="ward.D")
     #cl_node2vec = cutree(hc_node2vec, num_communities)
     #ids = as.numeric(names(cl_node2vec))
-    ids = match(1:length(cl_node2vec), node_order)
+    ids = match(1:n_nodes, node_order)
     cl_node2vec = cl_node2vec[ids]
-    #print(cl_node2vec)
+    print(cl_node2vec)
 
     
 
@@ -139,7 +140,11 @@ for(xx in 1:n_iter){
     ari_dice = ARI(membership_gt, cl_dice)
     ari_laplacian = ARI(membership_gt, cl_laplacian)
     if(any(is.na(cl_node2vec))){
-      ari_node2vec  = NaN  
+      #ari_node2vec  = NaN  
+      na_id = which(is.na(cl_node2vec))
+      cl_node2vec[na_id] = length(cl_node2vec) + na_id
+      print(cl_node2vec)
+      ari_node2vec = ARI(membership_gt, cl_node2vec) 
     }else{
       ari_node2vec = ARI(membership_gt, cl_node2vec)
     }
