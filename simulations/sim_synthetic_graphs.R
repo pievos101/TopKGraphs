@@ -57,7 +57,7 @@ for(xx in 1:n_iter){
     sizes <- c(10, 10, 10)
 
     # Connection probability matrix (3x3)
-    intra = 0.50
+    intra = 0.40
     inter = 0.10
 
     pref.matrix <- matrix(c(
@@ -97,6 +97,9 @@ for(xx in 1:n_iter){
 
     # Call Python's Node2Vec
     node2vec_emb = call_node2vec(g)
+    #print(dim(node2vec_emb))
+    node_order = round(as.numeric(node2vec_emb[,1]))
+    #print(node_order)
     node2vec_emb = as.matrix(node2vec_emb[,-1])
 
     #print(node2vec_emb)
@@ -120,8 +123,8 @@ for(xx in 1:n_iter){
     #hc_node2vec = hclust(dist(emb), method="ward.D")
     #cl_node2vec = cutree(hc_node2vec, num_communities)
     #ids = as.numeric(names(cl_node2vec))
-    #ids = match(1:length(cl_node2vec), ids)
-    #cl_node2vec = cl_node2vec[ids]
+    ids = match(1:length(cl_node2vec), node_order)
+    cl_node2vec = cl_node2vec[ids]
     #print(cl_node2vec)
 
     
@@ -135,15 +138,18 @@ for(xx in 1:n_iter){
     ari_jaccard = ARI(membership_gt, cl_jaccard)
     ari_dice = ARI(membership_gt, cl_dice)
     ari_laplacian = ARI(membership_gt, cl_laplacian)
-    ari_node2vec = ARI(membership_gt, cl_node2vec)
+    if(any(is.na(cl_node2vec))){
+      ari_node2vec  = NaN  
+    }else{
+      ari_node2vec = ARI(membership_gt, cl_node2vec)
+    }
     
-    #ari_node2vec = ARI(membership_gt, cl_node2vec)
-
     RES[xx,1] = ari_topkgraphs
     RES[xx,2] = ari_jaccard
     RES[xx,3] = ari_dice
     RES[xx,4] = ari_laplacian
     RES[xx,5] = ari_node2vec
+    
 
 print(RES)
 }
