@@ -57,8 +57,8 @@ for(xx in 1:n_iter){
     sizes <- c(10, 10, 10)
 
     # Connection probability matrix (3x3)
-    intra = 0.40
-    inter = 0.10
+    intra = 0.20
+    inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
