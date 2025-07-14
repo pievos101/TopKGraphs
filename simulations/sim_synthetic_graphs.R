@@ -58,7 +58,7 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.20
+    intra = 0.35
     inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
@@ -76,7 +76,7 @@ for(xx in 1:n_iter){
     # Plot with communities
     #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
-    res = topkgraphs(list(g), walk_depth=5, n_iter=20)
+    res = topkgraphs(list(g), walk_depth=5, n_iter=50)
 
     topkgraphs_sim = 1 - res$DIST
 
@@ -84,10 +84,14 @@ for(xx in 1:n_iter){
 
     dice_sim = similarity(g, method = "dice", mode = "all")
 
+    # Laplace
     L    =  laplacian_matrix(g, sparse = FALSE)
     eig  = eigen(L)
     emb  = eig$vectors#[,1:10]
 
+    #emb = embed_laplacian_matrix(g, 10)$X
+
+    #print(emb)
     # Node2Vec
     #edges = get.edgelist(g)
     #emb = node2vecR(edges)
