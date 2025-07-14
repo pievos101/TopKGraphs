@@ -1,5 +1,5 @@
 library(TopKLists)
-library(TopKSignal)
+#library(TopKSignal)
 library(igraph)
 
 
@@ -68,7 +68,7 @@ for(ii in 1:length(views)){
         graph = adjmatrix
     }
 
-    WALKS = matrix(NaN, walk_depth, n_iter)
+    WALKS = matrix(NaN, walk_depth + 1, n_iter)
 
         for(xx in 1:n_iter){
 

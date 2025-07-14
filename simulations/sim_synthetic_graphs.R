@@ -4,12 +4,13 @@ library(TopKLists)
 library(igraph)
 library(fastcluster) 
 library(cluster) 
-library(node2vec)
+#library(node2vec)
 
 source("/home/bastian/GitHub/TopKGraphs/simulations/sim.R")
 source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
 source("/home/bastian/GitHub/TopKGraphs/R/calc_BINARY.R")
 source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # Set seed for reproducibility
 # set.seed(123)
@@ -34,8 +35,8 @@ inter_prob <- 0.02  # Probability of connection between communities
 
 n_iter = 50 
 
-RES = matrix(NaN, n_iter, 4)
-colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian")
+RES = matrix(NaN, n_iter, 5)
+colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian", "Node2Vec")
 
 for(xx in 1:n_iter){
 
@@ -57,7 +58,7 @@ for(xx in 1:n_iter){
 
     # Connection probability matrix (3x3)
     intra = 0.50
-    inter = 0.25
+    inter = 0.10
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
@@ -92,6 +93,13 @@ for(xx in 1:n_iter){
     #ids = as.numeric(rownames(emb))
     #ids = match(1:nrow(emb), ids)
     #emb = emb[ids, ]
+    # ------------------
+
+    # Call Python's Node2Vec
+    node2vec_emb = call_node2vec(g)
+    node2vec_emb = as.matrix(node2vec_emb[,-1])
+
+    #print(node2vec_emb)
 
     hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D")
     cl_topkgraphs = cutree(hc_topkgraphs, num_communities)
@@ -105,12 +113,19 @@ for(xx in 1:n_iter){
     hc_laplacian = hclust(dist(scale(emb)), method="ward.D")
     cl_laplacian = cutree(hc_laplacian, num_communities)
 
+    hc_node2vec = hclust(dist(scale(node2vec_emb)), method="ward.D")
+    cl_node2vec = cutree(hc_node2vec, num_communities)
+
+    # ----------------------------------------------- #
     #hc_node2vec = hclust(dist(emb), method="ward.D")
     #cl_node2vec = cutree(hc_node2vec, num_communities)
     #ids = as.numeric(names(cl_node2vec))
     #ids = match(1:length(cl_node2vec), ids)
     #cl_node2vec = cl_node2vec[ids]
     #print(cl_node2vec)
+
+    
+
 
     library(aricode)
     #membership_gt <- rep(1:num_communities, each = nodes_per_community)
@@ -120,6 +135,7 @@ for(xx in 1:n_iter){
     ari_jaccard = ARI(membership_gt, cl_jaccard)
     ari_dice = ARI(membership_gt, cl_dice)
     ari_laplacian = ARI(membership_gt, cl_laplacian)
+    ari_node2vec = ARI(membership_gt, cl_node2vec)
     
     #ari_node2vec = ARI(membership_gt, cl_node2vec)
 
@@ -127,6 +143,7 @@ for(xx in 1:n_iter){
     RES[xx,2] = ari_jaccard
     RES[xx,3] = ari_dice
     RES[xx,4] = ari_laplacian
+    RES[xx,5] = ari_node2vec
 
 print(RES)
 }
