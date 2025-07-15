@@ -58,8 +58,8 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.35
-    inter = 0.05 # 0.05 is baseline
+    intra = 0.50 # 0.50 is baseline
+    inter = 0.01 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
