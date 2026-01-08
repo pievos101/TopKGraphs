@@ -1,3 +1,4 @@
+# Compare also to https://github.com/berenslab/graph-ne-paper
 # Simulate synthetic graphs
 # TopKGraphs
 library(TopKLists)
@@ -10,6 +11,7 @@ source("/home/bastian/GitHub/TopKGraphs/simulations/sim.R")
 source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
 source("/home/bastian/GitHub/TopKGraphs/R/calc_BINARY.R")
 source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # Set seed for reproducibility
