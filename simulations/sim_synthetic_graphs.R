@@ -48,7 +48,7 @@ for(xx in 1:n_iter){
     #                    nodes_per_community, 
     #                    5/10, 
     #                    2)
-
+    
     # Plot the graph
     #plot(g, vertex.color = membership(cluster_label_prop(g)), 
     #    vertex.label = NA, vertex.size = 6, 
