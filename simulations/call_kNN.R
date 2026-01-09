@@ -38,7 +38,7 @@ idx = np.arange(n)
 train_idx, test_idx = train_test_split(
     idx,
     test_size=0.2,
-    stratify=y
+    #stratify=y
 )
 
 # slice distance matrix correctly
