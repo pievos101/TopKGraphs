@@ -59,7 +59,7 @@ node2vec_emb = call_node2vec(largest)
 #print(dim(node2vec_emb))
 node_order = round(as.numeric(rownames(node2vec_emb)))
 #print(node_order)
-node2vec_emb = matrix(as.numeric(node2vec_emb), 
+node2vec_emb = matrix(as.numeric(unlist(node2vec_emb)), 
                             nrow=nrow(node2vec_emb), 
                             ncol=ncol(node2vec_emb))
 
