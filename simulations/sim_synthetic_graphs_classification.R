@@ -134,7 +134,7 @@ for(xx in 1:n_iter){
     #print(cl_node2vec)
 
     
-    library(aricode)
+    #library(aricode)
     #membership_gt <- rep(1:num_communities, each = nodes_per_community)
     membership_gt = rep(1:length(sizes), times = sizes)
 
