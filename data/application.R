@@ -27,8 +27,9 @@ components <- components(g)
 largest <- induced_subgraph(g, which(components$membership == which.max(components$csize)))
 
 
-# TopKGraphs
-res = topkgraphs(list(largest), walk_depth=20, n_iter=20, n_cores=5)
+## CALL TopKGraphs
+###################################
+res = topkgraphs(list(largest), walk_depth=50, n_iter=30, n_cores=5)
 
 hc = hclust(as.dist(res$DIST), method="ward.D2")
 
@@ -38,9 +39,8 @@ library(aricode)
 
 ari_topkgraphs = ARI(cl, V(largest)$community)
 
-## Node2Vec
+## CALL Node2Vec
 ###################################
-# Call Python's Node2Vec
 source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
 node2vec_emb = call_node2vec(largest)
 
