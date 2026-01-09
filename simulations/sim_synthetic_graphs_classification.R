@@ -58,7 +58,7 @@ for(xx in 1:n_iter){
     ######################################################
 
     # Sizes of the communities
-    sizes <- c(10, 10, 10)
+    sizes <- c(20, 20, 20)
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
@@ -113,59 +113,63 @@ for(xx in 1:n_iter){
 
     #print(node2vec_emb)
 
-    hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D")
-    cl_topkgraphs = cutree(hc_topkgraphs, num_communities)
+    knn_topkgraphs = call_kNN_dist(res$DIST, V(g)$community, k = 5)
 
-    hc_jaccard = hclust(as.dist(1-jaccard_sim), method="ward.D")
-    cl_jaccard = cutree(hc_jaccard, num_communities)
+    knn_jaccard = call_kNN_dist(1-jaccard_sim,V(g)$community, k = 5)
+    
+    knn_dice = call_kNN_dist(1-dice_sim,V(g)$community, k = 5)
+   
+    knn_laplacian = call_kNN_dist(as.matrix(dist(scale(emb))),
+                                      V(g)$community, k = 5)
 
-    hc_dice = hclust(as.dist(1-dice_sim), method="ward.D")
-    cl_dice = cutree(hc_dice, num_communities)
-
-    hc_laplacian = hclust(dist(scale(emb)), method="ward.D")
-    cl_laplacian = cutree(hc_laplacian, num_communities)
-
-    hc_node2vec = hclust(dist(scale(node2vec_emb)), method="ward.D")
-    cl_node2vec = cutree(hc_node2vec, num_communities)
-
+    knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb))),
+                                      V(g)$community, k = 5)
+    
     # ----------------------------------------------- #
     #hc_node2vec = hclust(dist(emb), method="ward.D")
     #cl_node2vec = cutree(hc_node2vec, num_communities)
     #ids = as.numeric(names(cl_node2vec))
-    ids = match(1:n_nodes, node_order)
-    cl_node2vec = cl_node2vec[ids]
-    print(cl_node2vec)
+    #ids = match(1:n_nodes, node_order)
+    #cl_node2vec = cl_node2vec[ids]
+    #print(cl_node2vec)
 
     
-
-
     library(aricode)
     #membership_gt <- rep(1:num_communities, each = nodes_per_community)
     membership_gt = rep(1:length(sizes), times = sizes)
 
-    ari_topkgraphs = ARI(membership_gt, cl_topkgraphs)
-    ari_jaccard = ARI(membership_gt, cl_jaccard)
-    ari_dice = ARI(membership_gt, cl_dice)
-    ari_laplacian = ARI(membership_gt, cl_laplacian)
-    if(any(is.na(cl_node2vec))){
-      #ari_node2vec  = NaN  
-      na_id = which(is.na(cl_node2vec))
-      cl_node2vec[na_id] = length(cl_node2vec) + na_id
-      print(cl_node2vec)
-      ari_node2vec = ARI(membership_gt, cl_node2vec) 
-    }else{
-      ari_node2vec = ARI(membership_gt, cl_node2vec)
-    }
+    library(caret)
+    all_levels <- sort(unique(c(knn_topkgraphs[[1]],knn_topkgraphs[[2]])))
+    cm_topkgraphs = confusionMatrix(factor(knn_topkgraphs[[1]], levels=all_levels), 
+                                    factor(knn_topkgraphs[[2]], levels=all_levels))
+
+    all_levels <- sort(unique(c(knn_jaccard[[1]],knn_jaccard[[2]])))
+    cm_jaccard = confusionMatrix(factor(knn_jaccard[[1]], levels=all_levels), 
+                                    factor(knn_jaccard[[2]], levels=all_levels))
+
+    all_levels <- sort(unique(c(knn_dice[[1]],knn_dice[[2]])))
+    cm_dice = confusionMatrix(factor(knn_dice[[1]], levels=all_levels), 
+                                    factor(knn_dice[[2]], levels=all_levels))
+
+    all_levels <- sort(unique(c(knn_laplacian[[1]],knn_laplacian[[2]])))
+    cm_laplacian = confusionMatrix(factor(knn_laplacian[[1]], levels=all_levels), 
+                                    factor(knn_laplacian[[2]], levels=all_levels))
+
+    all_levels <- sort(unique(c(knn_node2vec[[1]],knn_node2vec[[2]])))
+    cm_node2vec = confusionMatrix(factor(knn_node2vec[[1]], levels=all_levels), 
+                                    factor(knn_node2vec[[2]], levels=all_levels))
     
-    RES[xx,1] = ari_topkgraphs
-    RES[xx,2] = ari_jaccard
-    RES[xx,3] = ari_dice
-    RES[xx,4] = ari_laplacian
-    RES[xx,5] = ari_node2vec
+    RES[xx,1] = cm_topkgraphs$overall["Accuracy"]
+    RES[xx,2] = cm_jaccard$overall["Accuracy"]
+    RES[xx,3] = cm_dice$overall["Accuracy"]
+    RES[xx,4] = cm_laplacian$overall["Accuracy"]
+    RES[xx,5] = cm_node2vec$overall["Accuracy"]
     
 
 print(RES)
 }
+
+stop("All good ....")
 
 library(ggplot2)
 library(reshape)
@@ -179,8 +183,8 @@ p1 = ggplot(RES_melt, aes(x = Method, y = Value, fill = Method)) +
   theme_minimal(base_size = 14) +
   scale_fill_brewer(palette = "Set2") +
   labs(
-    title = "Clustering performance",
-    y = "Adjusted R-Index (ARI)",
+    title = "Classification performance",
+    y = "Accuracy",
     x = "Method"
   ) +
   theme(legend.position = "none")
