@@ -62,7 +62,7 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.30 # 0.50 is baseline
+    intra = 0.20 # 0.50 is baseline
     inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
@@ -108,8 +108,9 @@ for(xx in 1:n_iter){
     node2vec_emb = call_node2vec(g, walk_length=5, num_walks=50)
     #print(dim(node2vec_emb))
     node_order = round(as.numeric(node2vec_emb[,1]))
+    ids = match(1:length(V(g)), node_order)
     #print(node_order)
-    node2vec_emb = as.matrix(node2vec_emb[,-1])
+    node2vec_emb = as.matrix(node2vec_emb[ids,-1])
 
     #print(node2vec_emb)
 

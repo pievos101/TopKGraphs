@@ -58,27 +58,29 @@ node2vec_emb = call_node2vec(largest, walk_length=20, num_walks=100)
 
 #print(dim(node2vec_emb))
 node_order = round(as.numeric(rownames(node2vec_emb)))
+
 #print(node_order)
 node2vec_emb = matrix(as.numeric(unlist(node2vec_emb)), 
                             nrow=nrow(node2vec_emb), 
                             ncol=ncol(node2vec_emb))
 
+ids = match(1:length(V(largest)), node_order)
+
 # clustering
-hc_node2vec = hclust(dist(scale(node2vec_emb)), method="ward.D2")
+hc_node2vec = hclust(dist(scale(node2vec_emb[ids,-1])), method="ward.D2")
 cl_node2vec = cutree(hc_node2vec,  length(unique(V(largest)$community)))
 
 # ----------------------------------------------- #
 #hc_node2vec = hclust(dist(emb), method="ward.D")
 #cl_node2vec = cutree(hc_node2vec, num_communities)
 #ids = as.numeric(names(cl_node2vec))
-ids = match(1:length(V(largest)), node_order)
-cl_node2vec = cl_node2vec[ids]
+
+#cl_node2vec = cl_node2vec[ids]
 
 ari_node2vec = ARI(cl_node2vec, V(largest)$community)
 
 # classification 
-node_order = round(as.numeric(rownames(node2vec_emb)))[ids,]
-knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb_sorted[,-1]))),
+knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb[ids,-1]))),
                                       V(g)$community, k = 10)
 
 all_levels <- sort(unique(c(knn_node2vec[[1]],knn_node2vec[[2]])))
