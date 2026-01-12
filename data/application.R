@@ -30,7 +30,7 @@ largest <- induced_subgraph(g, which(components$membership == which.max(componen
 
 ## CALL TopKGraphs
 ###################################
-res = topkgraphs(list(largest), walk_depth=50, n_iter=30, n_cores=5)
+res = topkgraphs(list(largest), walk_depth=10, n_iter=10, n_cores=5)
 
 # clustering
 hc = hclust(as.dist(res$DIST), method="ward.D2")
@@ -54,7 +54,8 @@ acc_topkgraphs = cm_topkgraphs$overall["Accuracy"]
 ## CALL Node2Vec
 ###################################
 source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
-node2vec_emb = call_node2vec(largest)
+node2vec_emb = call_node2vec(largest, 
+                                walk_length=10, num_walks=100)
 
 #print(dim(node2vec_emb))
 node_order = round(as.numeric(rownames(node2vec_emb)))
@@ -77,7 +78,8 @@ cl_node2vec = cl_node2vec[ids]
 ari_node2vec = ARI(cl_node2vec, V(largest)$community)
 
 # classification 
-knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb))),
+node2vec_emb_sorted = node2vec_emb[ids,]
+knn_node2vec = call_kNN_dist(as.matrix(dist(node2vec_emb_sorted)),
                                       V(g)$community, k = 5)
 
 all_levels <- sort(unique(c(knn_node2vec[[1]],knn_node2vec[[2]])))
