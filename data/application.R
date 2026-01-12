@@ -40,7 +40,7 @@ library(aricode)
 ari_topkgraphs = ARI(cl, V(largest)$community)
 
 # classification
-knn_topkgraphs = call_kNN_dist(res$DIST, V(largest)$community, k = 10)
+knn_topkgraphs = call_kNN_dist(res$DIST, V(largest)$community, k = 5)
 
 
 library(caret)
@@ -50,6 +50,8 @@ cm_topkgraphs = confusionMatrix(factor(knn_topkgraphs[[1]], levels=all_levels),
 
 
 acc_topkgraphs = cm_topkgraphs$overall["Accuracy"]
+bacc_topkgraphs = mean(cm_topkgraphs$byClass[, "Balanced Accuracy"],
+                                 na.rm = TRUE)
 
 ## CALL Node2Vec
 ###################################
@@ -81,10 +83,11 @@ ari_node2vec = ARI(cl_node2vec, V(largest)$community)
 
 # classification 
 knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb[ids,-1]))),
-                                      V(largest)$community, k = 10)
+                                      V(largest)$community, k = 5)
 
 all_levels <- sort(unique(c(knn_node2vec[[1]],knn_node2vec[[2]])))
     cm_node2vec = confusionMatrix(factor(knn_node2vec[[1]], levels=all_levels), 
                                     factor(knn_node2vec[[2]], levels=all_levels))
                                     
 acc_node2vec = cm_node2vec$overall["Accuracy"]
+bacc_node2vec <- mean(cm_node2vec$byClass[, "Balanced Accuracy"], na.rm = TRUE)
