@@ -8,7 +8,7 @@ use_virtualenv("r-reticulate", required = FALSE)  # or use_python("/usr/bin/pyth
 py_install(c("node2vec", "networkx", "pandas"), pip = TRUE)
 
 # TODO -- make walk_length and num_walks params of the function
-call_node2vec <- function(g, walk_length=50, num_walks=500){
+call_node2vec <- function(g, walk_length=20, num_walks=10){
 
 
 walk_length = as.integer(walk_length)
@@ -41,7 +41,7 @@ G = nx.Graph()
 G.add_edges_from(edge_list)
 
 node2vec = Node2Vec(G, dimensions=128, walk_length=walk_length, 
-        num_walks=num_walks, workers=1)
+        num_walks=num_walks, workers=5)
 model = node2vec.fit(window=10, min_count=1, batch_words=4)
 embeddings = {str(node): model.wv[str(node)] for node in G.nodes()}
 ")

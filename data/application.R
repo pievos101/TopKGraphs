@@ -77,7 +77,7 @@ cl_node2vec = cl_node2vec[ids]
 ari_node2vec = ARI(cl_node2vec, V(largest)$community)
 
 # classification 
-node2vec_emb_sorted = node2vec_emb[ids,]
+node_order = round(as.numeric(rownames(node2vec_emb)))[ids,]
 knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb_sorted[,-1]))),
                                       V(g)$community, k = 10)
 
