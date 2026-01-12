@@ -58,7 +58,7 @@ for(xx in 1:n_iter){
     ######################################################
 
     # Sizes of the communities
-    sizes <- c(20, 20, 20)
+    sizes <- c(10, 10, 10)
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
@@ -114,18 +114,19 @@ for(xx in 1:n_iter){
 
     #print(node2vec_emb)
 
+    print(1)
     knn_topkgraphs = call_kNN_dist(res$DIST, V(g)$community, k = 5)
-
+    print(2)
     knn_jaccard = call_kNN_dist(1-jaccard_sim,V(g)$community, k = 5)
-    
+    print(3)  
     knn_dice = call_kNN_dist(1-dice_sim,V(g)$community, k = 5)
-   
+    print(4)
     knn_laplacian = call_kNN_dist(as.matrix(dist(scale(emb))),
                                       V(g)$community, k = 5)
-
+    print(5)
     knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb))),
                                       V(g)$community, k = 5)
-    
+    print(6)
     # ----------------------------------------------- #
     #hc_node2vec = hclust(dist(emb), method="ward.D")
     #cl_node2vec = cutree(hc_node2vec, num_communities)
