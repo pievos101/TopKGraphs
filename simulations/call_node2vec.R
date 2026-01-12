@@ -40,7 +40,7 @@ edge_list = edges.to_numpy().tolist()
 G = nx.Graph()
 G.add_edges_from(edge_list)
 
-node2vec = Node2Vec(G, dimensions=64, walk_length=walk_length, 
+node2vec = Node2Vec(G, dimensions=128, walk_length=walk_length, 
         num_walks=num_walks, workers=1)
 model = node2vec.fit(window=10, min_count=1, batch_words=4)
 embeddings = {str(node): model.wv[str(node)] for node in G.nodes()}
