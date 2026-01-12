@@ -89,7 +89,7 @@ embeddings = model.embedding.weight.detach().cpu().numpy()
   embedding_matrix <- py$embeddings
   rownames(embedding_matrix) <- nodes
 
-  return(embedding_matrix)
+  #return(embedding_matrix)
 
   embedding_df <- data.frame(
     node = nodes,
