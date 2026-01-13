@@ -170,7 +170,14 @@ for(xx in 1:n_iter){
     RES[xx,3] = cm_dice$overall["Accuracy"]
     RES[xx,4] = cm_laplacian$overall["Accuracy"]
     RES[xx,5] = cm_node2vec$overall["Accuracy"]
+
+    #RES[xx,1] = mean(cm_topkgraphs$byClass[, "Balanced Accuracy"],na.rm = TRUE)
+    #RES[xx,2] = mean(cm_jaccard$byClass[, "Balanced Accuracy"],na.rm = TRUE)
+    #RES[xx,3] = mean(cm_dice$byClass[, "Balanced Accuracy"],na.rm = TRUE)
+    #RES[xx,4] = mean(cm_laplacian$byClass[, "Balanced Accuracy"],na.rm = TRUE)
+    #RES[xx,5] = mean(cm_node2vec$byClass[, "Balanced Accuracy"],na.rm = TRUE)
     
+
 
 print(RES)
 }
