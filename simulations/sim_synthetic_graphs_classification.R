@@ -58,7 +58,7 @@ for(xx in 1:n_iter){
     ######################################################
 
     # Sizes of the communities
-    sizes <- c(20, 20, 20)
+    sizes <- c(10, 10, 10)
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
