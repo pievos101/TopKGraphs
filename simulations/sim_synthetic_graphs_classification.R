@@ -58,7 +58,7 @@ for(xx in 1:n_iter){
     ######################################################
 
     # Sizes of the communities
-    sizes <- c(10, 10, 10)
+    sizes <- c(20, 20, 20)
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
@@ -77,6 +77,10 @@ for(xx in 1:n_iter){
     # Assign community membership
     V(g)$community <- rep(1:length(sizes), times = sizes)
 
+    # Remove isolated nodes
+    g <- delete_vertices(g, V(g)[degree(g) == 0])
+    n_nodes = length(V(g))
+    
     # Plot with communities
     #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
