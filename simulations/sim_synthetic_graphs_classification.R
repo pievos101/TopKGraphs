@@ -62,7 +62,7 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.20 # 0.50 is baseline
+    intra = 0.30 # 0.50 is baseline
     inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
@@ -84,7 +84,7 @@ for(xx in 1:n_iter){
     # Plot with communities
     #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
-    res = topkgraphs(list(g), walk_depth=5, n_iter=50)
+    res = topkgraphs(list(g), walk_depth=20, n_iter=50)
 
     topkgraphs_sim = 1 - res$DIST
 
@@ -109,7 +109,7 @@ for(xx in 1:n_iter){
     # ------------------
 
     # Call Python's Node2Vec
-    node2vec_emb = call_node2vec(g, walk_length=5, num_walks=50)
+    node2vec_emb = call_node2vec(g, walk_length=20, num_walks=50, dimensions=128)
     #print(dim(node2vec_emb))
     node_order = round(as.numeric(node2vec_emb[,1]))
     ids = match(1:length(V(g)), node_order)
