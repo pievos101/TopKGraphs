@@ -91,3 +91,6 @@ all_levels <- sort(unique(c(knn_node2vec[[1]],knn_node2vec[[2]])))
                                     
 acc_node2vec = cm_node2vec$overall["Accuracy"]
 bacc_node2vec <- mean(cm_node2vec$byClass[, "Balanced Accuracy"], na.rm = TRUE)
+
+### CHECK the performance with varying k in kNN.
+# TODO
