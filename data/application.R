@@ -94,7 +94,7 @@ bacc_node2vec <- mean(cm_node2vec$byClass[, "Balanced Accuracy"], na.rm = TRUE)
 
 ### CHECK the performance with varying k in kNN.
 
-K = c(3,5,10,20,30)
+K = c(3,5,10,20,30,50)
 
 RES = matrix(NaN,2,length(K))
 rownames(RES) = c("TopKGraphs","Node2Vec")
