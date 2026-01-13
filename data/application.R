@@ -93,4 +93,41 @@ acc_node2vec = cm_node2vec$overall["Accuracy"]
 bacc_node2vec <- mean(cm_node2vec$byClass[, "Balanced Accuracy"], na.rm = TRUE)
 
 ### CHECK the performance with varying k in kNN.
-# TODO
+
+K = c(3,5,10,20,30)
+
+RES = matrix(NaN,2,length(K))
+rownames(RES) = c("TopKGraphs","Node2Vec")
+colnames(RES) = K
+
+for(xx in 1:length(K)){
+
+    # Call TopKgraphs
+    knn_topkgraphs = call_kNN_dist(res$DIST, V(largest)$community, k = K[xx])
+    
+    all_levels <- sort(unique(c(knn_topkgraphs[[1]],knn_topkgraphs[[2]])))
+    cm_topkgraphs = confusionMatrix(factor(knn_topkgraphs[[1]], levels=all_levels), 
+                                    factor(knn_topkgraphs[[2]], levels=all_levels))
+
+    bacc_topkgraphs = mean(cm_topkgraphs$byClass[, "Balanced Accuracy"],
+                                    na.rm = TRUE)
+
+    RES[1, xx] = bacc_topkgraphs
+
+    # Call Node2Vec
+    knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb[ids,-1]))),
+                                      V(largest)$community, k = K[xx])
+
+    all_levels <- sort(unique(c(knn_node2vec[[1]],knn_node2vec[[2]])))
+    cm_node2vec = confusionMatrix(factor(knn_node2vec[[1]], levels=all_levels), 
+                                        factor(knn_node2vec[[2]], levels=all_levels))
+                                        
+    bacc_node2vec <- mean(cm_node2vec$byClass[, "Balanced Accuracy"], na.rm = TRUE)
+
+    RES[2, xx] = bacc_node2vec
+
+print(RES)
+
+}
+
+### Plots
