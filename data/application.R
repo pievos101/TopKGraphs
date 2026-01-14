@@ -39,7 +39,7 @@ for(yy in 1:n_runs){
     res = topkgraphs(list(largest), walk_depth=20, n_iter=50, n_cores=5)
 
     # clustering
-    hc = hclust(as.dist(res$DIST), method="ward.D")
+    hc = hclust(as.dist(res$DIST), method="ward.D2")
     cl = cutree(hc, length(unique(V(largest)$community)))
 
     library(aricode)
@@ -77,7 +77,7 @@ for(yy in 1:n_runs){
     ids = match(1:length(V(largest)), node_order)
 
     # clustering
-    hc_node2vec = hclust(dist(scale(node2vec_emb[ids,-1])), method="ward.D")
+    hc_node2vec = hclust(dist(scale(node2vec_emb[ids,-1])), method="ward.D2")
     cl_node2vec = cutree(hc_node2vec,  length(unique(V(largest)$community)))
 
     # ----------------------------------------------- #
