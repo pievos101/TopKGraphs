@@ -82,7 +82,7 @@ for(xx in 1:n_iter){
     # Plot with communities
     #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
-    res = topkgraphs(list(g), walk_depth=20, n_iter=50)
+    res = topkgraphs(list(g), walk_depth=50, n_iter=50)
 
     topkgraphs_sim = 1 - res$DIST
 
@@ -107,7 +107,7 @@ for(xx in 1:n_iter){
     # ------------------
 
     # Call Python's Node2Vec
-    node2vec_emb = call_node2vec(g,walk_length=20, num_walks=50)
+    node2vec_emb = call_node2vec(g,walk_length=50, num_walks=50)
     #print(dim(node2vec_emb))
     node_order = round(as.numeric(node2vec_emb[,1]))
     #print(node_order)

@@ -72,6 +72,48 @@ print(p1)
 ###########################################################
 
 
+one = read.table("WD_2.txt")
+two = read.table("WD_3.txt")
+three = read.table("WD_5.txt")
+four = read.table("WD_10.txt")
+five = read.table("WD_20.txt")
+six = read.table("WD_30.txt")
+seven = read.table("WD_50.txt")
+
+
+L = list()
+L[[1]] = one
+L[[2]] = two
+L[[3]] = three
+L[[4]] = four
+L[[5]] = five
+L[[6]] = six
+L[[7]] = seven
+
+
+library(reshape)
+library(ggplot2)
+
+L_melt = melt(L)
+colnames(L_melt) = c("Method","value","signal")
+L_melt$signal = factor(L_melt$signal, 
+		labels=c("2","3","5","10","20","30","50"))
+
+p1 = ggplot(L_melt, aes(x = signal, y = value, fill = Method)) +
+  geom_boxplot(outlier.shape = NA, outlier.fill = "white", outlier.color = "black") +
+  theme_minimal(base_size = 14) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Clustering performance",
+    y = "Adjusted R-Index (ARI)",
+    x = "Walk Length"
+  ) +
+  theme(legend.position = "bottom")
+
+print(p1)
+
+
+###########################################################
 
 one = read.table("30_intra_2NN.txt")[,c(1,5)]
 two = read.table("30_intra_3NN.txt")[,c(1,5)]
