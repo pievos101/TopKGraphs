@@ -37,8 +37,9 @@ inter_prob <- 0.02  # Probability of connection between communities
 
 n_iter = 50 
 
-RES = matrix(NaN, n_iter, 5)
-colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian", "Node2Vec")
+RES = matrix(NaN, n_iter, 6)
+colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian", "PageRank",
+                "Node2Vec")
 
 for(xx in 1:n_iter){
 
@@ -60,7 +61,7 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.30 # 0.50 is baseline
+    intra = 0.50 # 0.50 is baseline
     inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
@@ -82,7 +83,7 @@ for(xx in 1:n_iter){
     # Plot with communities
     #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
-    res = topkgraphs(list(g), walk_depth=50, n_iter=50)
+    res = topkgraphs(list(g), walk_depth=20, n_iter=50)
 
     topkgraphs_sim = 1 - res$DIST
 
@@ -107,13 +108,23 @@ for(xx in 1:n_iter){
     # ------------------
 
     # Call Python's Node2Vec
-    node2vec_emb = call_node2vec(g,walk_length=50, num_walks=50)
+    node2vec_emb = call_node2vec(g,walk_length=20, num_walks=50)
     #print(dim(node2vec_emb))
     node_order = round(as.numeric(node2vec_emb[,1]))
     #print(node_order)
     node2vec_emb = as.matrix(node2vec_emb[,-1])
 
     #print(node2vec_emb)
+
+    # Page_rank
+    n <- vcount(g)
+
+    ppr_mat <- sapply(seq_len(n), function(i) {
+    pers <- rep(0, n)
+    pers[i] <- 1
+    page_rank(g, personalized = pers)$vector
+    })
+
 
     hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D2")
     cl_topkgraphs = cutree(hc_topkgraphs, num_communities)
@@ -129,6 +140,10 @@ for(xx in 1:n_iter){
 
     hc_node2vec = hclust(dist(scale(node2vec_emb)), method="ward.D2")
     cl_node2vec = cutree(hc_node2vec, num_communities)
+
+    hc_ppr = hclust(as.dist(1-ppr_mat), method="ward.D2")
+    cl_ppr = cutree(hc_ppr, num_communities)
+
 
     # ----------------------------------------------- #
     #hc_node2vec = hclust(dist(emb), method="ward.D")
@@ -149,6 +164,8 @@ for(xx in 1:n_iter){
     ari_jaccard = ARI(membership_gt, cl_jaccard)
     ari_dice = ARI(membership_gt, cl_dice)
     ari_laplacian = ARI(membership_gt, cl_laplacian)
+    ari_ppr = ARI(membership_gt, cl_ppr)
+    
 
     if(any(is.na(cl_node2vec))){
       #ari_node2vec  = NaN  
@@ -164,7 +181,8 @@ for(xx in 1:n_iter){
     RES[xx,2] = ari_jaccard
     RES[xx,3] = ari_dice
     RES[xx,4] = ari_laplacian
-    RES[xx,5] = ari_node2vec
+    RES[xx,5] = ari_ppr
+    RES[xx,6] = ari_node2vec
     
 
 print(RES)
