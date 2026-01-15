@@ -60,8 +60,8 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.50 # 0.50 is baseline
-    inter = 0.01 # 0.05 is baseline
+    intra = 0.30 # 0.50 is baseline
+    inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
@@ -75,10 +75,14 @@ for(xx in 1:n_iter){
     # Assign community membership
     V(g)$community <- rep(1:length(sizes), times = sizes)
 
+    # Remove isolated nodes
+    g <- delete_vertices(g, V(g)[degree(g) == 0])
+    n_nodes = length(V(g))
+
     # Plot with communities
     #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
-    res = topkgraphs(list(g), walk_depth=5, n_iter=50)
+    res = topkgraphs(list(g), walk_depth=20, n_iter=50)
 
     topkgraphs_sim = 1 - res$DIST
 
@@ -103,7 +107,7 @@ for(xx in 1:n_iter){
     # ------------------
 
     # Call Python's Node2Vec
-    node2vec_emb = call_node2vec(g)
+    node2vec_emb = call_node2vec(g,walk_length=20, num_walks=50)
     #print(dim(node2vec_emb))
     node_order = round(as.numeric(node2vec_emb[,1]))
     #print(node_order)
@@ -111,19 +115,19 @@ for(xx in 1:n_iter){
 
     #print(node2vec_emb)
 
-    hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D")
+    hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D2")
     cl_topkgraphs = cutree(hc_topkgraphs, num_communities)
 
-    hc_jaccard = hclust(as.dist(1-jaccard_sim), method="ward.D")
+    hc_jaccard = hclust(as.dist(1-jaccard_sim), method="ward.D2")
     cl_jaccard = cutree(hc_jaccard, num_communities)
 
-    hc_dice = hclust(as.dist(1-dice_sim), method="ward.D")
+    hc_dice = hclust(as.dist(1-dice_sim), method="ward.D2")
     cl_dice = cutree(hc_dice, num_communities)
 
-    hc_laplacian = hclust(dist(scale(emb)), method="ward.D")
+    hc_laplacian = hclust(dist(scale(emb)), method="ward.D2")
     cl_laplacian = cutree(hc_laplacian, num_communities)
 
-    hc_node2vec = hclust(dist(scale(node2vec_emb)), method="ward.D")
+    hc_node2vec = hclust(dist(scale(node2vec_emb)), method="ward.D2")
     cl_node2vec = cutree(hc_node2vec, num_communities)
 
     # ----------------------------------------------- #
@@ -132,24 +136,25 @@ for(xx in 1:n_iter){
     #ids = as.numeric(names(cl_node2vec))
     ids = match(1:n_nodes, node_order)
     cl_node2vec = cl_node2vec[ids]
-    print(cl_node2vec)
+    #print(cl_node2vec)
 
     
 
 
     library(aricode)
     #membership_gt <- rep(1:num_communities, each = nodes_per_community)
-    membership_gt = rep(1:length(sizes), times = sizes)
+    membership_gt = V(g)$community  #rep(1:length(sizes), times = sizes)
 
     ari_topkgraphs = ARI(membership_gt, cl_topkgraphs)
     ari_jaccard = ARI(membership_gt, cl_jaccard)
     ari_dice = ARI(membership_gt, cl_dice)
     ari_laplacian = ARI(membership_gt, cl_laplacian)
+
     if(any(is.na(cl_node2vec))){
       #ari_node2vec  = NaN  
       na_id = which(is.na(cl_node2vec))
       cl_node2vec[na_id] = length(cl_node2vec) + na_id
-      print(cl_node2vec)
+      #print(cl_node2vec)
       ari_node2vec = ARI(membership_gt, cl_node2vec) 
     }else{
       ari_node2vec = ARI(membership_gt, cl_node2vec)

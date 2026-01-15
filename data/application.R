@@ -5,9 +5,14 @@ node_labels = unlist(node_labels)
 
 
 n_runs = 30
+
 RES_list = list()
 ARI_res = matrix(NaN, n_runs, 2)
 colnames(ARI_res) = c("TopKGraphs","Node2Vec")
+
+NMI_res = matrix(NaN, n_runs, 2)
+colnames(NMI_res) = c("TopKGraphs","Node2Vec")
+
 
 for(yy in 1:n_runs){
 
@@ -36,7 +41,7 @@ for(yy in 1:n_runs){
 
     ## CALL TopKGraphs
     ###################################
-    res = topkgraphs(list(largest), walk_depth=20, n_iter=50, n_cores=5)
+    res = topkgraphs(list(largest), walk_depth=30, n_iter=50, n_cores=5)
 
     # clustering
     hc = hclust(as.dist(res$DIST), method="ward.D2")
@@ -44,8 +49,10 @@ for(yy in 1:n_runs){
 
     library(aricode)
     ari_topkgraphs = ARI(cl, V(largest)$community)
+    nmi_topkgraphs = NMI(cl, V(largest)$community)
 
     ARI_res[yy,1] =  ari_topkgraphs
+    NMI_res[yy,1] =  nmi_topkgraphs
 
     # classification
     knn_topkgraphs = call_kNN_dist(res$DIST, V(largest)$community, k = 5)
@@ -64,7 +71,7 @@ for(yy in 1:n_runs){
     ## CALL Node2Vec
     ###################################
     source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
-    node2vec_emb = call_node2vec(largest, walk_length=20, num_walks=50)
+    node2vec_emb = call_node2vec(largest, walk_length=30, num_walks=50)
 
     #print(dim(node2vec_emb))
     node_order = round(as.numeric(rownames(node2vec_emb)))
@@ -88,8 +95,11 @@ for(yy in 1:n_runs){
     #cl_node2vec = cl_node2vec[ids]
 
     ari_node2vec = ARI(cl_node2vec, V(largest)$community)
+    nmi_node2vec = NMI(cl_node2vec, V(largest)$community)
 
     ARI_res[yy,2] =  ari_node2vec
+    NMI_res[yy,2] =  nmi_node2vec
+
 
     # classification 
     knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb[ids,-1]))),
@@ -142,6 +152,9 @@ for(yy in 1:n_runs){
 
 RES_list[[yy]] = RES
 print(RES_list)
+print("ARI")
 print(ARI_res)
+print("NMI")
+print(NMI_res)
 }
 ### Plots
