@@ -39,8 +39,9 @@ inter_prob <- 0.02  # Probability of connection between communities
 
 n_iter = 50 
 
-RES = matrix(NaN, n_iter, 5)
-colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian", "Node2Vec")
+RES = matrix(NaN, n_iter, 6)
+colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian", 
+                      "PageRank", "Node2Vec")
 
 for(xx in 1:n_iter){
 
@@ -62,7 +63,7 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.30 # 0.50 is baseline
+    intra = 0.20 # 0.50 is baseline
     inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
@@ -118,6 +119,17 @@ for(xx in 1:n_iter){
 
     #print(node2vec_emb)
 
+    # PageRank
+    # Page_rank
+    n <- vcount(g)
+
+    ppr_mat <- sapply(seq_len(n), function(i) {
+    pers <- rep(0, n)
+    pers[i] <- 1
+    page_rank(g, personalized = pers)$vector
+    })
+
+
     print(1)
     knn_topkgraphs = call_kNN_dist(res$DIST, V(g)$community, k = 5)
     print(2)
@@ -139,7 +151,10 @@ for(xx in 1:n_iter){
     #cl_node2vec = cl_node2vec[ids]
     #print(cl_node2vec)
 
+    knn_ppr = call_kNN_dist(1-ppr_mat, V(g)$community, k = 5)
+    print(7)
     
+
     #library(aricode)
     #membership_gt <- rep(1:num_communities, each = nodes_per_community)
     membership_gt = rep(1:length(sizes), times = sizes)
@@ -164,12 +179,17 @@ for(xx in 1:n_iter){
     all_levels <- sort(unique(c(knn_node2vec[[1]],knn_node2vec[[2]])))
     cm_node2vec = confusionMatrix(factor(knn_node2vec[[1]], levels=all_levels), 
                                     factor(knn_node2vec[[2]], levels=all_levels))
+
+    all_levels <- sort(unique(c(knn_ppr[[1]],knn_ppr[[2]])))
+    cm_ppr = confusionMatrix(factor(knn_ppr[[1]], levels=all_levels), 
+                                    factor(knn_ppr[[2]], levels=all_levels))
     
     RES[xx,1] = cm_topkgraphs$overall["Accuracy"]
     RES[xx,2] = cm_jaccard$overall["Accuracy"]
     RES[xx,3] = cm_dice$overall["Accuracy"]
     RES[xx,4] = cm_laplacian$overall["Accuracy"]
-    RES[xx,5] = cm_node2vec$overall["Accuracy"]
+    RES[xx,5] = cm_ppr$overall["Accuracy"]
+    RES[xx,6] = cm_node2vec$overall["Accuracy"]
 
     #RES[xx,1] = mean(cm_topkgraphs$byClass[, "Balanced Accuracy"],na.rm = TRUE)
     #RES[xx,2] = mean(cm_jaccard$byClass[, "Balanced Accuracy"],na.rm = TRUE)
@@ -182,7 +202,7 @@ for(xx in 1:n_iter){
 print(RES)
 }
 
-stop("All good ....")
+#stop("All good ....")
 
 library(ggplot2)
 library(reshape)
