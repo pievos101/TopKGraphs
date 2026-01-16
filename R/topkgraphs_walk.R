@@ -1,3 +1,22 @@
+walk_with_restart <- function(graph, start_node, walk_depth, alpha=0.3){
+    
+  walk <- numeric(walk_depth + 1)
+  walk[1] <- start_node
+  current <- start_node
+  
+  for (i in 2:(walk_depth+1)){
+    if(runif(1) < alpha){
+      current <- start_node
+    } else {
+      neighbors <- neighbors(graph, current)
+      if(length(neighbors)==0) break
+      current <- sample(neighbors, 1)
+    }
+    walk[i] <- current
+  }
+  
+  return(walk)
+}
 
 
 topkgraphs_walk <- function(views, start_node=1, walk_depth=20, n_iter=20){
@@ -27,12 +46,12 @@ for(ii in 1:length(views)){
         for(xx in 1:n_iter){
 
             # Generate Random walks
-            list = random_walk(
+            list = walk_with_restart(
             graph,
             start_node,
             walk_depth,
-            mode = "all", #c("out", "in", "all", "total"),
-            stuck = c("return")
+            #mode = "all", #c("out", "in", "all", "total"),
+            #stuck = c("return")
             )
 
             list = as.numeric(list)
