@@ -62,7 +62,7 @@ for(xx in 1:n_iter){
 
     # Connection probability matrix (3x3)
     intra = 0.50 # 0.50 is baseline
-    inter = 0.05 # 0.05 is baseline
+    inter = 0.20 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
@@ -108,7 +108,7 @@ for(xx in 1:n_iter){
     # ------------------
 
     # Call Python's Node2Vec
-    node2vec_emb = call_node2vec(g,walk_length=20, num_walks=50)
+    node2vec_emb = call_node2vec(g, walk_length=20, num_walks=50)
     #print(dim(node2vec_emb))
     node_order = round(as.numeric(node2vec_emb[,1]))
     #print(node_order)
