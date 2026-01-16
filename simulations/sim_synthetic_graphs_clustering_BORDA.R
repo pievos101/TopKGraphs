@@ -37,9 +37,8 @@ inter_prob <- 0.02  # Probability of connection between communities
 
 n_iter = 50 
 
-RES = matrix(NaN, n_iter, 6)
-colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian", "PageRank",
-                "Node2Vec")
+RES = matrix(NaN, n_iter, 4)
+colnames(RES) = c("mean", "median", "geo.mean", "l2norm")
 
 for(xx in 1:n_iter){
 
@@ -83,106 +82,40 @@ for(xx in 1:n_iter){
     # Plot with communities
     #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
-    res = topkgraphs(list(g), walk_depth=20, n_iter=50)
-
-    topkgraphs_sim = 1 - res$DIST
-
-    jaccard_sim = similarity(g, method = "jaccard", mode = "all")
-
-    dice_sim = similarity(g, method = "dice", mode = "all")
-
-    # Laplace
-    L    =  laplacian_matrix(g, sparse = FALSE)
-    eig  = eigen(L)
-    emb  = eig$vectors#[,1:10]
-
-    #emb = embed_laplacian_matrix(g, 10)$X
-
-    #print(emb)
-    # Node2Vec
-    #edges = get.edgelist(g)
-    #emb = node2vecR(edges)
-    #ids = as.numeric(rownames(emb))
-    #ids = match(1:nrow(emb), ids)
-    #emb = emb[ids, ]
-    # ------------------
-
-    # Call Python's Node2Vec
-    node2vec_emb = call_node2vec(g, walk_length=20, num_walks=50)
-    #print(dim(node2vec_emb))
-    node_order = round(as.numeric(node2vec_emb[,1]))
-    #print(node_order)
-    node2vec_emb = as.matrix(node2vec_emb[,-1])
-
-    #print(node2vec_emb)
-
-    # Page_rank
-    n <- vcount(g)
-
-    ppr_mat <- sapply(seq_len(n), function(i) {
-    pers <- rep(0, n)
-    pers[i] <- 1
-    page_rank(g, personalized = pers)$vector
-    })
-
-
-    hc_topkgraphs = hclust(as.dist(res$DIST), method="ward.D2")
-    cl_topkgraphs = cutree(hc_topkgraphs, num_communities)
-
-    hc_jaccard = hclust(as.dist(1-jaccard_sim), method="ward.D2")
-    cl_jaccard = cutree(hc_jaccard, num_communities)
-
-    hc_dice = hclust(as.dist(1-dice_sim), method="ward.D2")
-    cl_dice = cutree(hc_dice, num_communities)
-
-    hc_laplacian = hclust(dist(scale(emb)), method="ward.D2")
-    cl_laplacian = cutree(hc_laplacian, num_communities)
-
-    hc_node2vec = hclust(dist(scale(node2vec_emb)), method="ward.D2")
-    cl_node2vec = cutree(hc_node2vec, num_communities)
-
-    hc_ppr = hclust(as.dist(1-ppr_mat), method="ward.D2")
-    cl_ppr = cutree(hc_ppr, num_communities)
-
-
-    # ----------------------------------------------- #
-    #hc_node2vec = hclust(dist(emb), method="ward.D")
-    #cl_node2vec = cutree(hc_node2vec, num_communities)
-    #ids = as.numeric(names(cl_node2vec))
-    ids = match(1:n_nodes, node_order)
-    cl_node2vec = cl_node2vec[ids]
-    #print(cl_node2vec)
-
+    res_mean = topkgraphs(list(g), walk_depth=20, n_iter=50, agg_method="mean")
+    res_median = topkgraphs(list(g), walk_depth=20, n_iter=50, agg_method="median")
+    res_geomean = topkgraphs(list(g), walk_depth=20, n_iter=50, agg_method="geo.mean")
+    res_l2norm = topkgraphs(list(g), walk_depth=20, n_iter=50, agg_method="l2norm")
     
 
+    hc_mean = hclust(as.dist(res_mean$DIST), method="ward.D2")
+    cl_mean = cutree(hc_mean, num_communities)
 
+    hc_median = hclust(as.dist(res_median$DIST), method="ward.D2")
+    cl_median = cutree(hc_median, num_communities)
+
+    hc_geomean = hclust(as.dist(res_geomean$DIST), method="ward.D2")
+    cl_geomean = cutree(hc_geomean, num_communities)
+
+    hc_l2norm = hclust(as.dist(res_l2norm$DIST), method="ward.D2")
+    cl_l2norm = cutree(hc_l2norm, num_communities)
+
+    
     library(aricode)
     #membership_gt <- rep(1:num_communities, each = nodes_per_community)
     membership_gt = V(g)$community  #rep(1:length(sizes), times = sizes)
 
-    ari_topkgraphs = ARI(membership_gt, cl_topkgraphs)
-    ari_jaccard = ARI(membership_gt, cl_jaccard)
-    ari_dice = ARI(membership_gt, cl_dice)
-    ari_laplacian = ARI(membership_gt, cl_laplacian)
-    ari_ppr = ARI(membership_gt, cl_ppr)
+    ari_mean = ARI(membership_gt, cl_mean)
+    ari_median = ARI(membership_gt, cl_median)
+    ari_geomean = ARI(membership_gt, cl_geomean)
+    ari_l2norm = ARI(membership_gt, cl_l2norm)
     
-
-    if(any(is.na(cl_node2vec))){
-      #ari_node2vec  = NaN  
-      na_id = which(is.na(cl_node2vec))
-      cl_node2vec[na_id] = length(cl_node2vec) + na_id
-      #print(cl_node2vec)
-      ari_node2vec = ARI(membership_gt, cl_node2vec) 
-    }else{
-      ari_node2vec = ARI(membership_gt, cl_node2vec)
-    }
     
-    RES[xx,1] = ari_topkgraphs
-    RES[xx,2] = ari_jaccard
-    RES[xx,3] = ari_dice
-    RES[xx,4] = ari_laplacian
-    RES[xx,5] = ari_ppr
-    RES[xx,6] = ari_node2vec
+    RES[xx,1] = ari_mean
+    RES[xx,2] = ari_median
+    RES[xx,3] = ari_geomean
+    RES[xx,4] = ari_l2norm
+  
     
 
 print(RES)

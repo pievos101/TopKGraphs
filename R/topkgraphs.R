@@ -3,7 +3,8 @@ library(TopKLists)
 library(igraph)
 source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 
-topkgraphs <- function(views, walk_depth=20, n_iter=50, n_cores=NaN){
+topkgraphs <- function(views, walk_depth=20, n_iter=50, 
+                                 n_cores=NaN, agg_method="mean"){
 
  RES = list()
  
@@ -51,7 +52,19 @@ DIST = matrix(NaN, length(RES), length(RES))
 
 for (xx in 1:length(RES)){
 
-    DIST[xx, as.numeric(RES[[xx]]$TopK[,1])] = RES[[xx]]$Scores[,1]
+   if(agg_method=="mean"){
+      DIST[xx, as.numeric(RES[[xx]]$TopK[,1])] = RES[[xx]]$Scores[,1]
+   }
+   if(agg_method=="median"){
+      DIST[xx, as.numeric(RES[[xx]]$TopK[,2])] = RES[[xx]]$Scores[,2]
+   }
+   if(agg_method=="geo.mean"){
+      DIST[xx, as.numeric(RES[[xx]]$TopK[,3])] = RES[[xx]]$Scores[,3]
+   }
+   if(agg_method=="l2norm"){
+      DIST[xx, as.numeric(RES[[xx]]$TopK[,4])] = RES[[xx]]$Scores[,4]
+   }
+   
 
 }
 
