@@ -1,5 +1,6 @@
+#
 walk_with_restart <- function(graph, start_node, walk_depth, alpha=0.3){
-    
+
   walk <- numeric(walk_depth + 1)
   walk[1] <- start_node
   current <- start_node
