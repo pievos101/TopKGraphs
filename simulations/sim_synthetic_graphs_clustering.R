@@ -61,8 +61,8 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.80 # 0.50 is baseline
-    inter = 0.40 # 0.05 is baseline
+    intra = 0.35 # 0.50 is baseline
+    inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
@@ -122,7 +122,7 @@ for(xx in 1:n_iter){
     ppr_mat <- sapply(seq_len(n), function(i) {
     pers <- rep(0, n)
     pers[i] <- 1
-    page_rank(g, personalized = pers)$vector
+    page_rank(g, personalized = pers, damping=0.7)$vector
     })
 
 
