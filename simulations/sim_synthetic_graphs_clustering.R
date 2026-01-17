@@ -76,6 +76,18 @@ for(xx in 1:n_iter){
     # Assign community membership
     V(g)$community <- rep(1:length(sizes), times = sizes)
 
+    ### optional - perturbation
+    # Remove fraction p of edges
+    #p <- 0.4
+    #edges_to_remove <- E(g)[runif(ecount(g)) < p]
+    #g <- delete_edges(g, edges_to_remove)
+    
+    # Rewire 10% of edges
+    #frac <- 0.3
+    #num_rewire <- ceiling(frac * ecount(g))
+    #g <- rewire(g, with = keeping_degseq(niter = num_rewire))
+    ####
+
     # Remove isolated nodes
     g <- delete_vertices(g, V(g)[degree(g) == 0])
     n_nodes = length(V(g))
@@ -92,7 +104,7 @@ for(xx in 1:n_iter){
     dice_sim = similarity(g, method = "dice", mode = "all")
 
     # Laplace
-    L    =  laplacian_matrix(g, sparse = FALSE)
+    L    = laplacian_matrix(g, sparse = FALSE)
     eig  = eigen(L)
     emb  = eig$vectors#[,1:10]
 
