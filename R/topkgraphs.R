@@ -1,7 +1,7 @@
 library(TopKLists)
 #library(TopKSignal)
 library(igraph)
-source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 
 topkgraphs <- function(views, walk_depth=20, n_iter=50, 
                                  n_cores=NaN, agg_method="mean"){

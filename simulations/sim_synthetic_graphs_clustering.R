@@ -7,12 +7,12 @@ library(fastcluster)
 library(cluster) 
 #library(node2vec)
 
-source("/home/bastian/GitHub/TopKGraphs/simulations/sim.R")
-source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
-source("/home/bastian/GitHub/TopKGraphs/R/calc_BINARY.R")
-source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
-source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
-source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
+source("/home/bpfeif/GitHub/TopKGraphs/simulations/sim.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/calc_SIL.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/calc_BINARY.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # Set seed for reproducibility
 # set.seed(123)
@@ -61,8 +61,8 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.70 # 0.50 is baseline
-    inter = 0.20 # 0.05 is baseline
+    intra = 0.80 # 0.50 is baseline
+    inter = 0.40 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
