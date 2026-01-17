@@ -1,4 +1,22 @@
 #
+walk_with_restart_fast <- function(adj_list, start_node, walk_depth, alpha=0.3) {
+  walk <- numeric(walk_depth + 1)
+  walk[1] <- start_node
+  current <- start_node
+  
+  for (i in 2:(walk_depth + 1)) {
+    if (runif(1) < alpha) {
+      current <- start_node  # restart
+    } else {
+      neighbors <- adj_list[[current]]
+      if (length(neighbors) == 0) break
+      current <- sample(neighbors, 1)
+    }
+    walk[i] <- current
+  }
+  return(walk)
+}
+#
 walk_with_restart <- function(graph, start_node, walk_depth, alpha=0.3){
 
   walk <- numeric(walk_depth + 1)
@@ -20,7 +38,11 @@ walk_with_restart <- function(graph, start_node, walk_depth, alpha=0.3){
 }
 
 
-topkgraphs_walk <- function(views, start_node=1, walk_depth=20, n_iter=20){
+topkgraphs_walk <- function(views, 
+                            start_node=1, 
+                            walk_depth=20, 
+                            n_iter=20, 
+                            alpha=0.3){
 
 WALKSALL = list()
 
@@ -43,23 +65,36 @@ for(ii in 1:length(views)){
     }
 
     WALKS = matrix(NaN, walk_depth + 1, n_iter)
+    
+    # Precompute adjacency list
+    adj_list <- lapply(V(graph), function(v) as.integer(neighbors(graph, v)))
 
-        for(xx in 1:n_iter){
+        #for(xx in 1:n_iter){
 
             # Generate Random walks
-            list = walk_with_restart(
-            graph,
-            start_node,
-            walk_depth,
+        #    list = walk_with_restart_fast(
+        #      adj_list,
+        #      start_node,
+        #      walk_depth
+        #    )
+            
+            #list = walk_with_restart(
+            #graph,
+            #start_node,
+            #walk_depth,
             #mode = "all", #c("out", "in", "all", "total"),
             #stuck = c("return")
-            )
+            #)
 
-            list = as.numeric(list)
+         #   list = as.numeric(list)
             #print(list)
             #print(dim(WALKS))
-            WALKS[,xx] = list
-        }
+         #   WALKS[,xx] = list
+        #}
+
+    WALKS = replicate(n_iter, walk_with_restart_fast(adj_list, 
+                      start_node=start_node, walk_depth= walk_depth, 
+                      alpha=alpha))
 
     WALKSALL[[ii]] = WALKS
 
