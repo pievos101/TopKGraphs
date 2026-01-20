@@ -94,7 +94,7 @@ for(ii in 1:length(views)){
 
     WALKS = replicate(n_iter, walk_with_restart_fast(adj_list, 
                       start_node=start_node, walk_depth= walk_depth, 
-                      alpha=alpha))
+                      alpha=alpha))      
 
     WALKSALL[[ii]] = WALKS
 
@@ -137,14 +137,23 @@ for (xx in 1:ncol(WALKS)){
 #print(rankMatrix)
 
 # check missings
-values = unique(rankMatrix)
+#print("Walks")
+#print(start_node)
+#print(rankMatrix)
+values = unique(as.vector(rankMatrix))
+#print("Unique values")
+#print(values)
 na_ids = which(rankMatrix=="NaN", arr.ind=TRUE)
-na_cols = na_ids[,2]
+na_cols = unique(na_ids[,2])
+#print(na_cols)
+#stop("Check")
 
 for(xx in 1:length(na_cols)){
 
    repl_val =  setdiff(values, rankMatrix[, na_cols[xx]])
    #print(rankMatrix[, na_cols[xx]])
+
+   #print("Replacers")
    #print(repl_val)
    if(length(repl_val)==0){next}
    repl_ids = which(rankMatrix[,na_cols[xx]]=="NaN")
@@ -157,6 +166,8 @@ for(xx in 1:length(na_cols)){
                                                 replace=FALSE) 
    #xx = xx + length(repl_ids) - 1
    #print("done")
+   #print("Updated Matrix")
+  # print(rankMatrix)
 
 }
 

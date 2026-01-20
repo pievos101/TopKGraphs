@@ -7,12 +7,12 @@ library(fastcluster)
 library(cluster) 
 #library(node2vec)
 
-source("/home/bpfeif/GitHub/TopKGraphs/simulations/sim.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/calc_SIL.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/calc_BINARY.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
-source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
+source("/home/bastian/GitHub/TopKGraphs/simulations/sim.R")
+source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
+source("/home/bastian/GitHub/TopKGraphs/R/calc_BINARY.R")
+source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # Set seed for reproducibility
 # set.seed(123)
@@ -57,12 +57,12 @@ for(xx in 1:n_iter){
     ######################################################
 
     # Sizes of the communities
-    sizes = c(10,10,10) #sample(c(5,10,20),3,replace=TRUE) #c(10, 20, 5)
+    sizes = c(30,30,30) #sample(c(5,10,20),3,replace=TRUE) #c(10, 20, 5)
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.50 # 0.50 is baseline
-    inter = 0.30 # 0.05 is baseline
+    intra = 0.30 # 0.50 is baseline
+    inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
@@ -89,7 +89,7 @@ for(xx in 1:n_iter){
     ####
 
     # Remove isolated nodes
-    g <- delete_vertices(g, V(g)[degree(g) == 0])
+    g = delete_vertices(g, V(g)[degree(g) == 0])
     n_nodes = length(V(g))
 
     # Plot with communities
