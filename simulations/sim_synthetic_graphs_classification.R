@@ -130,18 +130,19 @@ for(xx in 1:n_iter){
     })
 
 
+    setK = 10
     print(1)
-    knn_topkgraphs = call_kNN_dist(res$DIST, V(g)$community, k = 5)
+    knn_topkgraphs = call_kNN_dist(res$DIST, V(g)$community, k = setK)
     print(2)
-    knn_jaccard = call_kNN_dist(1-jaccard_sim,V(g)$community, k = 5)
+    knn_jaccard = call_kNN_dist(1-jaccard_sim,V(g)$community, k = setK)
     print(3)  
-    knn_dice = call_kNN_dist(1-dice_sim,V(g)$community, k = 5)
+    knn_dice = call_kNN_dist(1-dice_sim,V(g)$community, k = setK)
     print(4)
     knn_laplacian = call_kNN_dist(as.matrix(dist(scale(emb))),
-                                      V(g)$community, k = 5)
+                                      V(g)$community, k = setK)
     print(5)
     knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb))),
-                                      V(g)$community, k = 5)
+                                      V(g)$community, k = setK)
     print(6)
     # ----------------------------------------------- #
     #hc_node2vec = hclust(dist(emb), method="ward.D")

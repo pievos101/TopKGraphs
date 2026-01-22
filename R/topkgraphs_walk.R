@@ -106,21 +106,21 @@ WALKS = Reduce('cbind', WALKSALL)
 
 #print(WALKS)
 
-res1 = apply(WALKS, 2, table, simplify=FALSE)
+#res1 = apply(WALKS, 2, table, simplify=FALSE)
 
 #print(res1)
 
-res2 = sapply(res1, sort, decreasing=TRUE, simplify=FALSE)
+#res2 = sapply(res1, sort, decreasing=TRUE, simplify=FALSE)
 
 
-#res2 = apply(WALKS, 2, unique, simplify=FALSE)
+res2 = apply(WALKS, 2, unique, simplify=FALSE)
 
 
 #print(res2)
 #@FIXME ?? - this should be fixed now
 #n_nodes = max(as.numeric(unlist(sapply(res2, names))))
-n_nodes = length(unique(as.numeric(unlist(sapply(res2, names)))))
-#n_nodes = length(unique(unlist(res2)))
+#n_nodes = length(unique(as.numeric(unlist(sapply(res2, names)))))
+n_nodes = length(unique(unlist(res2)))
 #print(n_nodes)
 #print(ncol(WALKS))
 
@@ -129,8 +129,8 @@ rankMatrix = matrix(NaN, n_nodes, ncol(WALKS))
 # Fill the rank matrix
 for (xx in 1:ncol(WALKS)){
     
-    rankMatrix[1:length(res2[[xx]]),xx] = names(res2[[xx]])
-    #rankMatrix[1:length(res2[[xx]]),xx] = res2[[xx]]
+    #rankMatrix[1:length(res2[[xx]]),xx] = names(res2[[xx]])
+    rankMatrix[1:length(res2[[xx]]),xx] = res2[[xx]]
 
 }
 
