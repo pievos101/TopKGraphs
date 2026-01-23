@@ -47,26 +47,28 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
 
 #return(RES)
 
+#print(RES)
+
 # Convert to distance matrix
 DIST = matrix(NaN, length(RES), length(RES))
 
 for (xx in 1:length(RES)){
 
    if(agg_method=="mean"){
-      DIST[xx, as.numeric(RES[[xx]]$TopK[,1])] = 
-      RES[[xx]]$Scores[,1]
+      DIST[xx, as.numeric(RES[[xx]]$BORDA$TopK[,1])] = 
+      RES[[xx]]$BORDA$Scores[,1]
    }
    if(agg_method=="median"){
-      DIST[xx, as.numeric(RES[[xx]]$TopK[,2])] = 
-      RES[[xx]]$Scores[,2]
+      DIST[xx, as.numeric(RES[[xx]]$BORDA$TopK[,2])] = 
+      RES[[xx]]$BORDA$Scores[,2]
    }
    if(agg_method=="geo.mean"){
-      DIST[xx, as.numeric(RES[[xx]]$TopK[,3])] = 
-      RES[[xx]]$Scores[,3]
+      DIST[xx, as.numeric(RES[[xx]]$BORDA$TopK[,3])] = 
+      RES[[xx]]$BORDA$Scores[,3]
    }
    if(agg_method=="l2norm"){
-      DIST[xx, as.numeric(RES[[xx]]$TopK[,4])] = 
-      RES[[xx]]$Scores[,4]
+      DIST[xx, as.numeric(RES[[xx]]$BORDA$TopK[,4])] = 
+      RES[[xx]]$BORDA$Scores[,4]
    }
    
 
