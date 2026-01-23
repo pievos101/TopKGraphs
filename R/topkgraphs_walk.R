@@ -273,7 +273,7 @@ library(TopKSignal)
 library(gurobi)
 
 estimatedSignal <- estimateTheta(R.input = IN, 
-         num.boot = 30, b = 0.1, solver = "gurobi", 
+         num.boot = 50, b = 0.1, solver = "gurobi", 
          type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",
          nCore = 5)
 

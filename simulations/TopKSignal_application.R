@@ -23,7 +23,7 @@ sizes <- c(10, 10, 10)
 n_nodes = sum(sizes)
 
 # Connection probability matrix (3x3)
-intra = 0.10 # 0.50 is baseline
+intra = 0.50 # 0.50 is baseline
 inter = 0.05 # 0.05 is baseline
 
 pref.matrix <- matrix(c(
@@ -45,7 +45,7 @@ n_nodes = length(V(g))
 
 # Get the rank Matrix for a node
 
-res = topkgraphs_walk(list(g), start_node=1, walk_depth=10, n_iter=20)
+res = topkgraphs_walk(list(g), start_node=20, walk_depth=20, n_iter=30)
 
 RM = res$RM 
 colnames(RM) = paste("r",1:ncol(RM), sep="")

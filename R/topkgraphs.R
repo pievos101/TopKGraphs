@@ -85,8 +85,15 @@ for (xx in 1:length(RES)){
 
 }
 
+if(!do.TopKSignal){
 DIST = DIST/max(DIST, na.rm=TRUE)
-print(any(is.na(DIST)))
+}
+
+if(do.TopKSignal){
+DIST = 1 - DIST/max(DIST, na.rm=TRUE)
+}
+
+#print(any(is.na(DIST)))
 DIST[is.na(DIST)] = 1
 diag(DIST) = 0
 
