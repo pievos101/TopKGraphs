@@ -95,7 +95,7 @@ for(xx in 1:n_iter){
     # Plot with communities
     #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
-    res = topkgraphs(list(g), walk_depth=20, n_iter=30, do.TopKSignal=TRUE)
+    res = topkgraphs(list(g), walk_depth=20, n_iter=30, do.TopKSignal=FALSE)
     print(res)
 
     topkgraphs_sim = 1 - res$DIST
