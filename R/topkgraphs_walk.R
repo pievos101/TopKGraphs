@@ -121,11 +121,13 @@ res2 = apply(WALKS, 2, unique, simplify=FALSE)
 #n_nodes = max(as.numeric(unlist(sapply(res2, names))))
 #n_nodes1 = length(unique(as.numeric(unlist(sapply(res2, names)))))
 n_nodes = length(unique(unlist(res2)))
+#print(unique(unlist(res2)))
 #n_nodes = unique(c(n_nodes1, n_nodes2))
 #print(n_nodes)
 #print(ncol(WALKS))
 
 rankMatrix = matrix(NaN, n_nodes, ncol(WALKS))
+#print(rankMatrix)
 #rankMatrix2 = matrix(NaN, n_nodes2, ncol(WALKS))
 
 # Fill the rank matrix
@@ -152,9 +154,12 @@ na_cols = unique(na_ids[,2])
 #print(na_cols)
 #stop("Check")
 
+
 for(xx in 1:length(na_cols)){
 
    repl_val =  setdiff(values, rankMatrix[, na_cols[xx]])
+   #print(repl_val)
+
    #print(rankMatrix[, na_cols[xx]])
 
    #print("Replacers")
@@ -166,8 +171,15 @@ for(xx in 1:length(na_cols)){
    #print("start")
    #print(na_cols[xx])
    #print(rankMatrix)
-   rankMatrix[repl_ids, na_cols[xx]] = sample(repl_val, length(repl_val), 
-                                                replace=FALSE) 
+
+   if(length(repl_val)==1){
+   repl_val_perm = repl_val 
+   }else{
+   repl_val_perm = sample(repl_val, length(repl_val), replace=FALSE) 
+   }
+
+   #print(repl_val_perm)
+   rankMatrix[repl_ids, na_cols[xx]] = repl_val_perm
    #xx = xx + length(repl_ids) - 1
    #print("done")
    #print("Updated Matrix")
@@ -179,6 +191,12 @@ for(xx in 1:length(na_cols)){
 
 #print(rankMatrix)
 
+#print(rankMatrix)
+#print(dim(rankMatrix))
+#print(length(unique(as.vector(rankMatrix))))
+#print(unique(as.vector(rankMatrix)))
+
+
 na_ids = which(rankMatrix=="NaN", arr.ind=TRUE)
 na_rows = unique(na_ids[,1])
 
@@ -186,6 +204,7 @@ na_rows = unique(na_ids[,1])
 
 if(length(na_rows)!=0){
     rankMatrix = rankMatrix[-na_rows,]
+    #print("There are remaining NaN's")
 }
 
 #print(rankMatrix)

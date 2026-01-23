@@ -49,7 +49,14 @@ res = topkgraphs_walk(list(g), start_node=1, walk_depth=10, n_iter=20)
 
 RM = res$RM 
 colnames(RM) = paste("r",1:ncol(RM), sep="")
-rownames(RM) = paste("p",1:nrow(RM), sep="")
+rownames(RM) = paste("v",1:nrow(RM), sep="")
+
+
+IN = matrix(NaN, nrow(RM), ncol(RM))
+colnames(IN) = paste("r",1:ncol(RM), sep="")
+node_names = sort(unique(as.vector(RM)))
+rownames(IN) = node_names
+
 
 library(TopKSignal)
 library(gurobi)
@@ -58,3 +65,8 @@ estimatedSignal <- estimateTheta(R.input = RM,
          num.boot = 50, b = 0.1, solver = "gurobi", 
          type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",
          nCore = 1)
+
+
+
+estimateTheta(R.input = input$R.input, num.boot = 50, b = 0.1, solver = "gurobi", 
+type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",nCore = 1)
