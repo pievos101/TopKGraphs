@@ -219,6 +219,7 @@ if(length(na_rows)!=0){
 
 rankMatrix2 = rankMatrix
 borda.res = NaN
+
 if(!do.TopKSignal){
 
 IN          <- lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
