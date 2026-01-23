@@ -38,7 +38,7 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
 
     RES = foreach(xx = 1:n_nodes, .combine = c,
                     .export = "topkgraphs_walk",
-                    .packages = c("igraph","TopKLists") ) %dopar% {
+                    .packages = c("igraph","TopKLists","TopKSignal") ) %dopar% {
                      list(topkgraphs_walk(views, 
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
@@ -77,10 +77,10 @@ for (xx in 1:length(RES)){
       
       }
 
-      if(do.TopKSignal){
+   if(do.TopKSignal){
          DIST[xx, as.numeric(RES[[xx]]$TS$id)] = 
-         RES[[xx]]$TS$signal.estimate
-      }
+         1 / (1 + exp(-RES[[xx]]$TS$signal.estimate))
+   }
 
 
 }
