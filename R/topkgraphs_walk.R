@@ -42,7 +42,7 @@ topkgraphs_walk <- function(views,
                             start_node=1, 
                             walk_depth=20, 
                             n_iter=20, 
-                            alpha=0.3){
+                            alpha=0.3, do.TopKSignal=TRUE){
 
 WALKSALL = list()
 
@@ -112,14 +112,11 @@ WALKS = Reduce('cbind', WALKSALL)
 
 #res2 = sapply(res1, sort, decreasing=TRUE, simplify=FALSE)
 
-
 res2 = apply(WALKS, 2, unique, simplify=FALSE)
 
 
 #print(res2)
-#@FIXME ?? - this should be fixed now
-#n_nodes = max(as.numeric(unlist(sapply(res2, names))))
-#n_nodes1 = length(unique(as.numeric(unlist(sapply(res2, names)))))
+#n_nodes = length(unique(as.numeric(unlist(sapply(res2, names)))))
 n_nodes = length(unique(unlist(res2)))
 #print(unique(unlist(res2)))
 #n_nodes = unique(c(n_nodes1, n_nodes2))
@@ -221,6 +218,8 @@ if(length(na_rows)!=0){
 #print(rankMatrix2)
 
 rankMatrix2 = rankMatrix
+borda.res = NaN
+if(!do.TopKSignal){
 
 IN          <- lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
 
@@ -242,6 +241,9 @@ TKSrank_geomean   <- match(1:length(TKSrank_geomean),as.numeric(TKSrank_geomean)
 #print(length(TKSrank))
 # ---------------------------------------------- #
 
+}
+
+
 #rownames(rankMatrix2) = paste("p", 1:nrow(rankMatrix2), sep="")
 #colnames(rankMatrix2) = paste("r", 1:ncol(rankMatrix2), sep="")
 
@@ -257,6 +259,25 @@ TKSrank_geomean   <- match(1:length(TKSrank_geomean),as.numeric(TKSrank_geomean)
 
 #TKSrank_topksignal = rank(-estimatedSignal$estimation$signal.estimate)
 
-return(list(BORDA=borda.res, RM=rankMatrix2))
+if(do.TopKSignal){
+
+
+node_names = sort(unique(as.vector(rankMatrix2)))
+IN = apply(rankMatrix2, 2, function(x){match(node_names,x)})
+rownames(IN) = node_names
+colnames(IN) = paste("r",1:ncol(rankMatrix2), sep="")
+
+
+library(TopKSignal)
+library(gurobi)
+
+estimatedSignal <- estimateTheta(R.input = IN, 
+         num.boot = 30, b = 0.1, solver = "gurobi", 
+         type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",
+         nCore = 5)
+
+}
+
+return(list(BORDA=borda.res, RM=rankMatrix2, TS=estimatedSignal$estimation))
 
 }

@@ -4,7 +4,8 @@ library(igraph)
 source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 
 topkgraphs <- function(views, walk_depth=20, n_iter=50, 
-                                 n_cores=NaN, agg_method="mean"){
+                                 n_cores=NaN, agg_method="mean", 
+                                 do.TopKSignal=TRUE){
 
  RES = list()
  
@@ -22,7 +23,7 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
         RES[[xx]] = topkgraphs_walk(views, 
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
-                                n_iter=n_iter)
+                                n_iter=n_iter,do.TopKSignal=do.TopKSignal)
     }
  }else{ # parallel computation
  
@@ -41,7 +42,7 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
                      list(topkgraphs_walk(views, 
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
-                                n_iter=n_iter)$BORDA)
+                                n_iter=n_iter,do.TopKSignal=do.TopKSignal))
     }
  }
 
@@ -53,6 +54,9 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
 DIST = matrix(NaN, length(RES), length(RES))
 
 for (xx in 1:length(RES)){
+
+
+   if(!do.TopKSignal){
 
    if(agg_method=="mean"){
       DIST[xx, as.numeric(RES[[xx]]$BORDA$TopK[,1])] = 
@@ -71,6 +75,13 @@ for (xx in 1:length(RES)){
       RES[[xx]]$BORDA$Scores[,4]
    }
    
+   }
+
+   if(do.TopKSignal){
+      DIST[xx, as.numeric(RES[[xx]]$TK$id)] = 
+      RES[[xx]]$TK$signal.estimate
+   }
+
 
 }
 

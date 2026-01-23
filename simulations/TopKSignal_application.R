@@ -54,19 +54,20 @@ rownames(RM) = paste("v",1:nrow(RM), sep="")
 
 IN = matrix(NaN, nrow(RM), ncol(RM))
 colnames(IN) = paste("r",1:ncol(RM), sep="")
-node_names = sort(unique(as.vector(RM)))
-rownames(IN) = node_names
 
+node_names = sort(unique(as.vector(RM)))
+
+
+IN = apply(RM, 2, function(x){match(node_names,x)})
+rownames(IN) = node_names
 
 library(TopKSignal)
 library(gurobi)
 
-estimatedSignal <- estimateTheta(R.input = RM, 
+estimatedSignal <- estimateTheta(R.input = IN, 
          num.boot = 50, b = 0.1, solver = "gurobi", 
          type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",
          nCore = 1)
 
+estimatedSignal$estimation
 
-
-estimateTheta(R.input = input$R.input, num.boot = 50, b = 0.1, solver = "gurobi", 
-type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",nCore = 1)
