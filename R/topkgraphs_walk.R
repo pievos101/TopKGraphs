@@ -259,7 +259,7 @@ TKSrank_geomean   <- match(1:length(TKSrank_geomean),as.numeric(TKSrank_geomean)
 
 
 #TKSrank_topksignal = rank(-estimatedSignal$estimation$signal.estimate)
-
+latent_signal = NaN
 if(do.TopKSignal){
 
 
@@ -277,8 +277,10 @@ estimatedSignal <- estimateTheta(R.input = IN,
          type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",
          nCore = 5)
 
+latent_signal = estimatedSignal$estimation
+
 }
 
-return(list(BORDA=borda.res, RM=rankMatrix2, TS=estimatedSignal$estimation))
+return(list(BORDA=borda.res, RM=rankMatrix2, TS=latent_signal))
 
 }
