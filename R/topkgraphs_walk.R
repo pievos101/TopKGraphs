@@ -119,12 +119,14 @@ res2 = apply(WALKS, 2, unique, simplify=FALSE)
 #print(res2)
 #@FIXME ?? - this should be fixed now
 #n_nodes = max(as.numeric(unlist(sapply(res2, names))))
-#n_nodes = length(unique(as.numeric(unlist(sapply(res2, names)))))
+#n_nodes1 = length(unique(as.numeric(unlist(sapply(res2, names)))))
 n_nodes = length(unique(unlist(res2)))
+#n_nodes = unique(c(n_nodes1, n_nodes2))
 #print(n_nodes)
 #print(ncol(WALKS))
 
 rankMatrix = matrix(NaN, n_nodes, ncol(WALKS))
+#rankMatrix2 = matrix(NaN, n_nodes2, ncol(WALKS))
 
 # Fill the rank matrix
 for (xx in 1:ncol(WALKS)){
@@ -133,6 +135,8 @@ for (xx in 1:ncol(WALKS)){
     rankMatrix[1:length(res2[[xx]]),xx] = res2[[xx]]
 
 }
+
+#rankMatrix = cbind(rankMatrix1, rankMatrix2)
 
 #print(rankMatrix)
 
@@ -234,6 +238,6 @@ TKSrank_geomean   <- match(1:length(TKSrank_geomean),as.numeric(TKSrank_geomean)
 
 #TKSrank_topksignal = rank(-estimatedSignal$estimation$signal.estimate)
 
-return(borda.res)
+return(list(BORDA=borda.res, RM=rankMatrix2))
 
 }

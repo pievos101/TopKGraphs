@@ -41,7 +41,7 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
                      list(topkgraphs_walk(views, 
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
-                                n_iter=n_iter))
+                                n_iter=n_iter)$BORDA)
     }
  }
 
@@ -73,6 +73,7 @@ for (xx in 1:length(RES)){
 }
 
 DIST = DIST/max(DIST, na.rm=TRUE)
+print(any(is.na(DIST)))
 DIST[is.na(DIST)] = 1
 diag(DIST) = 0
 

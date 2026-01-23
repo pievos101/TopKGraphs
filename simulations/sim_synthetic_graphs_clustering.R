@@ -61,7 +61,7 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.30 # 0.50 is baseline
+    intra = 0.40 # 0.50 is baseline
     inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
@@ -95,7 +95,7 @@ for(xx in 1:n_iter){
     # Plot with communities
     #plot(g, vertex.color = V(g)$community, layout = layout_with_fr)
 
-    res = topkgraphs(list(g), walk_depth=40, n_iter=50)
+    res = topkgraphs(list(g), walk_depth=20, n_iter=50)
 
     topkgraphs_sim = 1 - res$DIST
 
