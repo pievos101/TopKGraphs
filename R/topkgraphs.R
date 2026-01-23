@@ -90,6 +90,7 @@ DIST = DIST/max(DIST, na.rm=TRUE)
 }
 
 if(do.TopKSignal){
+DIST[DIST<0] = 0
 DIST = 1 - DIST/max(DIST, na.rm=TRUE)
 }
 
