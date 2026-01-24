@@ -1,4 +1,43 @@
-#
+walk_with_jaccard_bias <- function(adj_list, start_node, walk_depth = 20, 
+                                   alpha = 0.3, beta = 2, eps = 1e-3) {
+  
+  deg <- sapply(adj_list, length)
+  walk <- integer(walk_depth + 1)
+  walk[1] <- start_node
+  current <- start_node
+  
+  start_neighbors <- adj_list[[start_node]]
+  
+  for(i in 2:(walk_depth + 1)) {
+    
+    if(runif(1) < alpha) {
+      # Restart
+      current <- start_node
+    } else {
+      neighbors <- adj_list[[current]]
+      if(length(neighbors) == 0) break
+      
+      # Compute Jaccard similarity with start_node
+      jaccard_sim <- sapply(neighbors, function(v) {
+        nv <- adj_list[[v]]
+        length(intersect(nv, start_neighbors)) / 
+          length(unique(c(nv, start_neighbors)))
+      })
+      
+      # Combine degree and Jaccard
+      w <- (1 / (deg[neighbors]^beta)) * (jaccard_sim + eps)
+      w <- w / sum(w)
+      
+      current <- sample(neighbors, 1, prob = w)
+    }
+    
+    walk[i] <- current
+  }
+  
+  return(walk)
+}
+
+
 walk_with_restart_fast <- function(adj_list, start_node, walk_depth, alpha=0.3) {
   walk <- numeric(walk_depth + 1)
   walk[1] <- start_node
@@ -95,7 +134,7 @@ for(ii in 1:length(views)){
          #   WALKS[,xx] = list
         #}
 
-    WALKS = replicate(n_iter, walk_with_restart_fast(adj_list, 
+    WALKS = replicate(n_iter, walk_with_jaccard_bias(adj_list, 
                       start_node=start_node, walk_depth= walk_depth, 
                       alpha=alpha))      
 
