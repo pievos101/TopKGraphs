@@ -1,3 +1,63 @@
+walk_with_jaccard_degree_safe <- function(adj_list, start_node, walk_depth = 20, 
+                                         alpha = 0.3, beta = 2, eps = 1e-3) {
+
+  deg <- sapply(adj_list, length)
+  walk <- integer(walk_depth + 1)
+  walk[1] <- start_node
+  current <- start_node
+  start_neighbors <- adj_list[[start_node]]
+
+  for(i in 2:(walk_depth + 1)) {
+
+    # restart
+    if(runif(1) < alpha) {
+      current <- start_node
+      walk[i] <- current
+      next
+    }
+
+    neighbors <- adj_list[[current]]
+
+    # if no neighbors, restart
+    if(length(neighbors) == 0) {
+      current <- start_node
+      walk[i] <- current
+      next
+    }
+
+    # compute Jaccard similarity
+    jaccard_sim <- sapply(neighbors, function(v) {
+      nv <- adj_list[[v]]
+      inter_len <- length(intersect(nv, start_neighbors))
+      union_len <- length(unique(c(nv, start_neighbors)))
+      if(union_len == 0) return(0)
+      inter_len / union_len
+    })
+
+    # degree weighting
+    deg_neighbors <- pmax(deg[neighbors], 1)
+    w <- (1 / (deg_neighbors^beta)) * (jaccard_sim + eps)
+
+    # ensure weights are valid
+    if(length(w) != length(neighbors) || all(is.na(w)) || sum(w) == 0) {
+      w <- rep(1, length(neighbors))
+    }
+
+    w <- w / sum(w)
+
+    # sample safely
+    if(length(neighbors) == 1) {
+      current <- neighbors[1]
+    } else {
+      current <- sample(neighbors, 1, prob = w)
+    }
+
+    walk[i] <- current
+  }
+
+  return(walk)
+}
+
 walk_with_jaccard_bias <- function(adj_list, start_node, walk_depth = 20, 
                                    alpha = 0.3, beta = 2, eps = 1e-3) {
   
@@ -27,7 +87,8 @@ walk_with_jaccard_bias <- function(adj_list, start_node, walk_depth = 20,
       # Combine degree and Jaccard
       w <- (1 / (deg[neighbors]^beta)) * (jaccard_sim + eps)
       w <- w / sum(w)
-      
+      #print(neighbors) 
+      #print(w)
       current <- sample(neighbors, 1, prob = w)
     }
     
@@ -134,7 +195,7 @@ for(ii in 1:length(views)){
          #   WALKS[,xx] = list
         #}
 
-    WALKS = replicate(n_iter, walk_with_jaccard_bias(adj_list, 
+    WALKS = replicate(n_iter, walk_with_jaccard_degree_safe(adj_list, 
                       start_node=start_node, walk_depth= walk_depth, 
                       alpha=alpha))      
 
