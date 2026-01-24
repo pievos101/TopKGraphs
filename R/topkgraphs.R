@@ -4,8 +4,10 @@ library(igraph)
 #source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 
 topkgraphs <- function(views, walk_depth=20, n_iter=50, 
-                                 n_cores=NaN, agg_method="mean", 
-                                 do.TopKSignal=FALSE){
+                                 n_cores=NaN, agg_method="mean",
+                                 do.BORDA = TRUE, 
+                                 do.TopKSignal=FALSE,
+                                 do.RRA=FALSE){
 
  RES = list()
  
@@ -23,7 +25,10 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
         RES[[xx]] = topkgraphs_walk(views, 
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
-                                n_iter=n_iter,do.TopKSignal=do.TopKSignal)
+                                n_iter=n_iter,
+                                do.BORDA=do.BORDA, 
+                                do.TopKSignal=do.TopKSignal,
+                                do.RRA=do.RRA)
     }
  }else{ # parallel computation
  
@@ -42,7 +47,10 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
                      list(topkgraphs_walk(views, 
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
-                                n_iter=n_iter,do.TopKSignal=do.TopKSignal))
+                                n_iter=n_iter,
+                                do.BORDA=do.BORDA, 
+                                do.TopKSignal=do.TopKSignal,
+                                do.RRA=do.RRA))
     }
  }
 
@@ -56,7 +64,7 @@ DIST = matrix(NaN, length(RES), length(RES))
 for (xx in 1:length(RES)){
 
 
-   if(!do.TopKSignal){
+   if(do.BORDA){
 
       if(agg_method=="mean"){
          DIST[xx, as.numeric(RES[[xx]]$BORDA$TopK[,1])] = 
@@ -82,16 +90,25 @@ for (xx in 1:length(RES)){
          1 / (1 + exp(-RES[[xx]]$TS$signal.estimate))
    }
 
+   if(do.RRA){
+      DIST[xx, as.numeric(RES[[xx]]$RRA$Name)] = 
+         1 / (1 + exp(-RES[[xx]]$RRA$Score))
+   }
+
 
 }
 
-if(!do.TopKSignal){
+if(do.BORDA){
 DIST = DIST/max(DIST, na.rm=TRUE)
 }
 
 if(do.TopKSignal){
 DIST[DIST<0] = 0
 DIST = 1 - DIST/max(DIST, na.rm=TRUE)
+}
+
+if(do.RRA){
+DIST = DIST/max(DIST, na.rm=TRUE)
 }
 
 #print(any(is.na(DIST)))

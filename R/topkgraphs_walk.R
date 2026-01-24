@@ -42,7 +42,10 @@ topkgraphs_walk <- function(views,
                             start_node=1, 
                             walk_depth=20, 
                             n_iter=20, 
-                            alpha=0.3, do.TopKSignal=TRUE){
+                            alpha=0, 
+                            do.BORDA=TRUE, 
+                            do.TopKSignal=FALSE,
+                            do.RRA=FALSE){
 
 WALKSALL = list()
 
@@ -220,7 +223,7 @@ if(length(na_rows)!=0){
 rankMatrix2 = rankMatrix
 borda.res = NaN
 
-if(!do.TopKSignal){
+if(do.BORDA){
 
 IN          <- lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
 
@@ -269,8 +272,8 @@ rownames(IN) = node_names
 colnames(IN) = paste("r",1:ncol(rankMatrix2), sep="")
 
 
-library(TopKSignal)
-library(gurobi)
+require(TopKSignal)
+require(gurobi)
 
 estimatedSignal <- estimateTheta(R.input = IN, 
          num.boot = 50, b = 0.1, solver = "gurobi", 
@@ -281,6 +284,21 @@ latent_signal = estimatedSignal$estimation
 
 }
 
-return(list(BORDA=borda.res, RM=rankMatrix2, TS=latent_signal))
+agg.res = list()
+if(do.RRA){
+  require(RobustRankAggreg)
+  node_names = sort(unique(as.vector(rankMatrix2)))
+  IN = apply(rankMatrix2, 2, function(x){match(node_names,x)})
+  rownames(IN) = node_names
+  colnames(IN) = paste("r",1:ncol(rankMatrix2), sep="")
+  rankMatrix = IN
+  rankMatrix2 <- apply(rankMatrix,2, function(x) match(1:length(x),x))
+  rankMatrix2 <- matrix(as.character(rankMatrix2), dim(rankMatrix2)[1],dim(rankMatrix2)[2])
+  IN          <- lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
+  agg.res     <- aggregateRanks(IN)
+
+}
+
+return(list(BORDA=borda.res, RM=rankMatrix2, TS=latent_signal, RRA=agg.res))
 
 }
