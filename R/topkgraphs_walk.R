@@ -115,30 +115,30 @@ WALKS = Reduce('cbind', WALKSALL)
 
 #res2 = sapply(res1, sort, decreasing=TRUE, simplify=FALSE)
 
-res2 = apply(WALKS, 2, unique, simplify=FALSE)
+res3 = apply(WALKS, 2, unique, simplify=FALSE)
 
 
 #print(res2)
-#n_nodes = length(unique(as.numeric(unlist(sapply(res2, names)))))
-n_nodes = length(unique(unlist(res2)))
+#n_nodes1 = length(unique(as.numeric(unlist(sapply(res2, names)))))
+n_nodes2 = length(unique(unlist(res3)))
 #print(unique(unlist(res2)))
 #n_nodes = unique(c(n_nodes1, n_nodes2))
 #print(n_nodes)
 #print(ncol(WALKS))
 
-rankMatrix = matrix(NaN, n_nodes, ncol(WALKS))
+#rankMatrix1 = matrix(NaN, n_nodes1, ncol(WALKS))
 #print(rankMatrix)
-#rankMatrix2 = matrix(NaN, n_nodes2, ncol(WALKS))
+rankMatrix2 = matrix(NaN, n_nodes2, ncol(WALKS))
 
 # Fill the rank matrix
 for (xx in 1:ncol(WALKS)){
     
-    #rankMatrix[1:length(res2[[xx]]),xx] = names(res2[[xx]])
-    rankMatrix[1:length(res2[[xx]]),xx] = res2[[xx]]
+    #rankMatrix1[1:length(res2[[xx]]),xx] = names(res2[[xx]])
+    rankMatrix2[1:length(res3[[xx]]),xx] = res3[[xx]]
 
 }
 
-#rankMatrix = cbind(rankMatrix1, rankMatrix2)
+rankMatrix = rankMatrix2 # cbind(rankMatrix1, rankMatrix2)
 
 #print(rankMatrix)
 
@@ -179,7 +179,9 @@ for(xx in 1:length(na_cols)){
    }
 
    #print(repl_val_perm)
-   rankMatrix[repl_ids, na_cols[xx]] = repl_val_perm
+   
+   #rankMatrix[repl_ids, na_cols[xx]] = repl_val_perm
+   
    #xx = xx + length(repl_ids) - 1
    #print("done")
    #print("Updated Matrix")
@@ -197,15 +199,15 @@ for(xx in 1:length(na_cols)){
 #print(unique(as.vector(rankMatrix)))
 
 
-na_ids = which(rankMatrix=="NaN", arr.ind=TRUE)
-na_rows = unique(na_ids[,1])
+#na_ids = which(rankMatrix=="NaN", arr.ind=TRUE)
+#na_rows = unique(na_ids[,1])
 
 #print(na_rows)
 
-if(length(na_rows)!=0){
-    rankMatrix = rankMatrix[-na_rows,]
+#if(length(na_rows)!=0){
+#    rankMatrix = rankMatrix[-na_rows,]
     #print("There are remaining NaN's")
-}
+#}
 
 #print(rankMatrix)
 
@@ -226,7 +228,10 @@ borda.res = NaN
 if(do.BORDA){
 
 IN          <- lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
+#print(IN)
+#print(IN)
 
+IN = lapply(IN, function(x){as.numeric(x[!is.na(as.numeric(x))])})
 #print(IN)
 
 borda.res   <- Borda(IN)
@@ -266,21 +271,21 @@ latent_signal = NaN
 if(do.TopKSignal){
 
 
-node_names = sort(unique(as.vector(rankMatrix2)))
-IN = apply(rankMatrix2, 2, function(x){match(node_names,x)})
-rownames(IN) = node_names
-colnames(IN) = paste("r",1:ncol(rankMatrix2), sep="")
+  node_names = sort(unique(as.vector(rankMatrix2)))
+  IN = apply(rankMatrix2, 2, function(x){match(node_names,x)})
+  rownames(IN) = node_names
+  colnames(IN) = paste("r",1:ncol(rankMatrix2), sep="")
 
 
-require(TopKSignal)
-require(gurobi)
+  require(TopKSignal)
+  require(gurobi)
 
-estimatedSignal <- estimateTheta(R.input = IN, 
-         num.boot = 50, b = 0.1, solver = "gurobi", 
-         type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",
-         nCore = 5)
+  estimatedSignal <- estimateTheta(R.input = IN, 
+          num.boot = 50, b = 0.1, solver = "gurobi", 
+          type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",
+          nCore = 5)
 
-latent_signal = estimatedSignal$estimation
+  latent_signal = estimatedSignal$estimation
 
 }
 

@@ -60,7 +60,7 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
 
 # Convert to distance matrix
 DIST = matrix(NaN, length(RES), length(RES))
-
+#print(RES)
 for (xx in 1:length(RES)){
 
 
