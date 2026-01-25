@@ -1,3 +1,6 @@
+require(Rcpp)
+Rcpp::sourceCpp("/home/bpfeif/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
+
 walk_with_jaccard_degree_safe <- function(adj_list, start_node, walk_depth = 20, 
                                          alpha = 0.3, beta = 2, eps = 1e-3) {
 
@@ -195,7 +198,7 @@ for(ii in 1:length(views)){
          #   WALKS[,xx] = list
         #}
 
-    WALKS = replicate(n_iter, walk_with_jaccard_degree_safe(adj_list, 
+    WALKS = replicate(n_iter, walk_with_jaccard_degree_safe_cpp(adj_list,
                       start_node=start_node, walk_depth= walk_depth, 
                       alpha=alpha))      
 
