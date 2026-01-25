@@ -1,6 +1,79 @@
 require(Rcpp)
 Rcpp::sourceCpp("/home/bpfeif/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
 
+walk_with_jaccard_degree_safe2 <- function(adj_list, start_node, walk_depth = 20, 
+                                         alpha = 0.3, beta = 2, eps = 1e-3) {
+
+  deg <- sapply(adj_list, length)
+
+  walk <- integer(walk_depth + 1)
+  walk[1] <- start_node
+  current <- start_node
+
+  for (i in 2:(walk_depth + 1)) {
+
+    # restart
+    if (runif(1) < alpha) {
+      current <- start_node
+      walk[i] <- current
+      next
+    }
+
+    neighbors <- adj_list[[current]]
+
+    # if no neighbors, restart
+    if (length(neighbors) == 0) {
+      current <- start_node
+      walk[i] <- current
+      next
+    }
+
+    ## ---- ANCHOR SELECTION ---- ##
+    if (i > 2) {
+      anchor <- sample(walk[1:(i - 1)], 1)
+    } else {
+      anchor <- start_node
+    }
+    anchor_neighbors <- adj_list[[anchor]]
+    ## -------------------------- ##
+
+    ## ---- JACCARD TO ANCHOR ---- ##
+    jaccard_sim <- sapply(neighbors, function(v) {
+      nv <- adj_list[[v]]
+      inter_len <- length(intersect(nv, anchor_neighbors))
+      union_len <- length(unique(c(nv, anchor_neighbors)))
+      if (union_len == 0) return(0)
+      inter_len / union_len
+    })
+    ## --------------------------- ##
+
+    # degree weighting (hub suppression)
+    deg_neighbors <- pmax(deg[neighbors], 1)
+    w <- (1 / (deg_neighbors^beta)) * (jaccard_sim + eps)
+
+    # safety checks
+    if (length(w) != length(neighbors) || any(is.na(w)) || sum(w) <= 0) {
+      w <- rep(1, length(neighbors))
+    }
+
+    w <- w / sum(w)
+
+    # sample next node
+    current <- if (length(neighbors) == 1) {
+      neighbors[1]
+    } else {
+      sample(neighbors, 1, prob = w)
+    }
+
+    walk[i] <- current
+  }
+
+  walk
+}
+
+
+
+
 walk_with_jaccard_degree_safe <- function(adj_list, start_node, walk_depth = 20, 
                                          alpha = 0.3, beta = 2, eps = 1e-3) {
 
@@ -119,6 +192,7 @@ walk_with_restart_fast <- function(adj_list, start_node, walk_depth, alpha=0.3) 
   }
   return(walk)
 }
+
 #
 walk_with_restart <- function(graph, start_node, walk_depth, alpha=0.3){
 
@@ -145,11 +219,15 @@ topkgraphs_walk <- function(views,
                             start_node=1, 
                             walk_depth=20, 
                             n_iter=20, 
-                            alpha=0, 
+                            alpha=0.1, 
                             do.BORDA=TRUE, 
                             do.TopKSignal=FALSE,
                             do.RRA=FALSE){
 
+
+
+require(Rcpp)
+Rcpp::sourceCpp("/home/bpfeif/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
 WALKSALL = list()
 
 for(ii in 1:length(views)){

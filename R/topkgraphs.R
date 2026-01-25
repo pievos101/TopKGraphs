@@ -41,9 +41,12 @@ topkgraphs <- function(views, walk_depth=20, n_iter=50,
     # Register the cluster
     registerDoParallel(cl)
 
+    require(Rcpp)
+    Rcpp::sourceCpp("/home/bpfeif/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
+
     RES = foreach(xx = 1:n_nodes, .combine = c,
                     .export = "topkgraphs_walk",
-                    .packages = c("igraph","TopKLists","TopKSignal") ) %dopar% {
+                    .packages = c("igraph","TopKLists") ) %dopar% {
                      list(topkgraphs_walk(views, 
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
