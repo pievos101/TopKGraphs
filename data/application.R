@@ -24,11 +24,11 @@ for(yy in 1:n_runs){
     library(fastcluster) 
     library(cluster) 
 
-    source("/home/bpfeif/GitHub/TopKGraphs/R/calc_SIL.R")
-    source("/home/bpfeif/GitHub/TopKGraphs/R/calc_BINARY.R")
-    source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
-    source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
-    source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_kNN.R")
+    source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
+    source("/home/bastian/GitHub/TopKGraphs/R/calc_BINARY.R")
+    source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
+    source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+    source("/home/bastian/GitHub/TopKGraphs/simulations/call_kNN.R")
 
     # Assign community membership
     V(g)$community = node_labels
@@ -42,7 +42,7 @@ for(yy in 1:n_runs){
 
     ## CALL TopKGraphs
     ###################################
-    res = topkgraphs(list(largest), walk_depth=30, n_iter=30, n_cores=5)
+    res = topkgraphs(list(largest), walk_depth=200, n_iter=50, n_cores=5)
 
     # clustering
     hc = hclust(as.dist(res$DIST), method="ward.D2")
@@ -71,7 +71,7 @@ for(yy in 1:n_runs){
 
     ## CALL Node2Vec
     ###################################
-    source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
+    source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
     node2vec_emb = call_node2vec(largest, walk_length=30, num_walks=50)
 
     #print(dim(node2vec_emb))

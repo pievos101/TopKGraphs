@@ -37,8 +37,12 @@ inter_prob <- 0.02  # Probability of connection between communities
 
 n_iter = 50 
 
-RES = matrix(NaN, n_iter, 6)
-colnames(RES) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian", "PageRank",
+RES_ari = matrix(NaN, n_iter, 6)
+colnames(RES_ari) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian", "PageRank",
+                "Node2Vec")
+
+RES_nmi = matrix(NaN, n_iter, 6)
+colnames(RES_nmi) = c("TopKGraphs", "Jaccard", "Dice", "Laplacian", "PageRank",
                 "Node2Vec")
 
 for(xx in 1:n_iter){
@@ -61,8 +65,8 @@ for(xx in 1:n_iter){
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.99 # 0.50 is baseline
-    inter = 0.80 # 0.05 is baseline
+    intra = 0.50 # 0.50 is baseline
+    inter = 0.15 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
@@ -181,6 +185,13 @@ for(xx in 1:n_iter){
     ari_dice = ARI(membership_gt, cl_dice)
     ari_laplacian = ARI(membership_gt, cl_laplacian)
     ari_ppr = ARI(membership_gt, cl_ppr)
+
+    nmi_topkgraphs = NMI(membership_gt, cl_topkgraphs)
+    nmi_jaccard = NMI(membership_gt, cl_jaccard)
+    nmi_dice = NMI(membership_gt, cl_dice)
+    nmi_laplacian = NMI(membership_gt, cl_laplacian)
+    nmi_ppr = NMI(membership_gt, cl_ppr)
+
     
 
     if(any(is.na(cl_node2vec))){
@@ -188,21 +199,37 @@ for(xx in 1:n_iter){
       na_id = which(is.na(cl_node2vec))
       cl_node2vec[na_id] = length(cl_node2vec) + na_id
       #print(cl_node2vec)
-      ari_node2vec = ARI(membership_gt, cl_node2vec) 
+      ari_node2vec = ARI(membership_gt, cl_node2vec)
+      nmi_node2vec = NMI(membership_gt, cl_node2vec) 
+
     }else{
       ari_node2vec = ARI(membership_gt, cl_node2vec)
+      nmi_node2vec = NMI(membership_gt, cl_node2vec)
     }
     
-    RES[xx,1] = ari_topkgraphs
-    RES[xx,2] = ari_jaccard
-    RES[xx,3] = ari_dice
-    RES[xx,4] = ari_laplacian
-    RES[xx,5] = ari_ppr
-    RES[xx,6] = ari_node2vec
+    RES_ari[xx,1] = ari_topkgraphs
+    RES_ari[xx,2] = ari_jaccard
+    RES_ari[xx,3] = ari_dice
+    RES_ari[xx,4] = ari_laplacian
+    RES_ari[xx,5] = ari_ppr
+    RES_ari[xx,6] = ari_node2vec
+
+    RES_nmi[xx,1] = nmi_topkgraphs
+    RES_nmi[xx,2] = nmi_jaccard
+    RES_nmi[xx,3] = nmi_dice
+    RES_nmi[xx,4] = nmi_laplacian
+    RES_nmi[xx,5] = nmi_ppr
+    RES_nmi[xx,6] = nmi_node2vec
     
 
-print(RES)
+print("ARI")
+print(RES_ari)
+print("NMI")
+print(RES_nmi)
+
 }
+
+RES = RES_ari
 
 library(ggplot2)
 library(reshape)
