@@ -1,5 +1,6 @@
 require(Rcpp)
-Rcpp::sourceCpp("/home/bpfeif/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
+Rcpp::sourceCpp("/home/bastian/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
+
 
 walk_with_jaccard_degree_safe2 <- function(adj_list, start_node, walk_depth = 20, 
                                          alpha = 0.3, beta = 2, eps = 1e-3) {
@@ -70,8 +71,6 @@ walk_with_jaccard_degree_safe2 <- function(adj_list, start_node, walk_depth = 20
 
   walk
 }
-
-
 
 
 walk_with_jaccard_degree_safe <- function(adj_list, start_node, walk_depth = 20, 
@@ -219,7 +218,7 @@ topkgraphs_walk <- function(views,
                             start_node=1, 
                             walk_depth=20, 
                             n_iter=20, 
-                            alpha=0.1, 
+                            alpha=0, 
                             do.BORDA=TRUE, 
                             do.TopKSignal=FALSE,
                             do.RRA=FALSE){
@@ -227,7 +226,7 @@ topkgraphs_walk <- function(views,
 
 
 require(Rcpp)
-Rcpp::sourceCpp("/home/bpfeif/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
+Rcpp::sourceCpp("/home/bastian/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
 WALKSALL = list()
 
 for(ii in 1:length(views)){
