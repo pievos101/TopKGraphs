@@ -61,18 +61,27 @@ for(xx in 1:n_iter){
     ######################################################
 
     # Sizes of the communities
-    sizes = c(30,30,30) #sample(c(5,10,20),3,replace=TRUE) #c(10, 20, 5)
+    sizes = c(50,50,50) #sample(c(5,10,20),3,replace=TRUE) #c(10, 20, 5)
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.70 # 0.50 is baseline
-    inter = 0.40 # 0.05 is baseline
+    intra = 0.50 # 0.50 is baseline
+    inter = 0.20 # 0.05 is baseline
 
     pref.matrix <- matrix(c(
       intra, inter, inter,
       inter, intra, inter,
       inter, inter, intra
     ), nrow = 3, byrow = TRUE)
+
+    #sizes <- c(50, 50, 100)   # unbalanced communities
+    #p <- matrix(
+    #c(0.15, 0.02, 0.005,
+    #  0.02, 0.15, 0.005,
+    #  0.005,0.005,0.05),
+    #  nrow = 3
+    #)
+
 
     # Generate the SBM graph
     g <- sample_sbm(sum(sizes), pref.matrix, block.sizes = sizes)
