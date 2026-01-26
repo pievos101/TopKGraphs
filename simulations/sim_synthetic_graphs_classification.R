@@ -7,13 +7,13 @@ library(fastcluster)
 library(cluster) 
 #library(node2vec)
 
-source("/home/bpfeif/GitHub/TopKGraphs/simulations/sim.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/calc_SIL.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/calc_BINARY.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
-source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
-source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_kNN.R")
+source("/home/bastian/GitHub/TopKGraphs/simulations/sim.R")
+source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
+source("/home/bastian/GitHub/TopKGraphs/R/calc_BINARY.R")
+source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
+source("/home/bastian/GitHub/TopKGraphs/simulations/call_kNN.R")
 
 
 # Set seed for reproducibility
@@ -59,7 +59,7 @@ for(xx in 1:n_iter){
     ######################################################
 
     # Sizes of the communities
-    sizes <- c(30, 30, 30)
+    sizes <- c(20, 20, 20)
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
@@ -130,7 +130,7 @@ for(xx in 1:n_iter){
     })
 
 
-    setK = 10
+    setK = 5
     print(1)
     knn_topkgraphs = call_kNN_dist(res$DIST, V(g)$community, k = setK)
     print(2)
