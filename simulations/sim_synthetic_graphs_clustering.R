@@ -74,8 +74,9 @@ for(xx in 1:n_iter){
       inter, inter, intra
     ), nrow = 3, byrow = TRUE)
 
-    #sizes <- c(50, 50, 100)   # unbalanced communities
-    #p <- matrix(
+    #sizes <- c(30, 30, 100)   # unbalanced communities
+    #n_nodes = sum(sizes)
+    #pref.matrix <- matrix(
     #c(0.15, 0.02, 0.005,
     #  0.02, 0.15, 0.005,
     #  0.005,0.005,0.05),
