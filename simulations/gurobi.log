@@ -1,0 +1,16 @@
+
+Gurobi 13.0.1 (linux64, gurobi_cl) logging started Fri Jan 23 10:41:27 2026
+
+Set parameter Username
+Set parameter LicenseID to value 2769327
+Set parameter LogFile to value "gurobi.log"
+Using license file /home/bastian/gurobi.lic
+Academic license - for non-commercial use only - expires 2027-01-23
+
+Gurobi 13.0.1 (linux64, gurobi_cl) logging started Fri Jan 23 10:47:28 2026
+
+Set parameter Username
+Set parameter LicenseID to value 2769327
+Set parameter LogFile to value "gurobi.log"
+Using license file /home/bastian/gurobi.lic
+Academic license - for non-commercial use only - expires 2027-01-23

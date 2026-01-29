@@ -9,7 +9,7 @@ IntegerVector walk_with_jaccard_degree_safe_cpp2(
     int start_node,
     int walk_depth = 20,
     double alpha = 0.0,
-    double beta = 0,
+    double beta = 0.0,
     double eps = 1e-3
 ) {
   int n = adj_list.size();
