@@ -43,11 +43,11 @@ for(xx in 1:n_iter){
   # Generate LFR benchmark graph in R
   # ----------------------------
   n_nodes <- 100
-  avg_degree <- 5
-  max_degree <- 10
-  min_community <- 10
+  avg_degree <- 30 #5
+  max_degree <- 50 #10
+  min_community <- 5
   max_community <- 50
-  mu <- 0.30 # Mixing parameter
+  mu <- 0.20 # Mixing parameter
   tau1 <- 2 #2
   tau2 <- 1.1 #1.1   # tau2 must be > 1 for netUtils
   
