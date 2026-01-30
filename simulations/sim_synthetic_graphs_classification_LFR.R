@@ -7,6 +7,16 @@ library(fastcluster)
 library(cluster) 
 #library(node2vec)
 
+library(TopKLists)
+library(igraph)
+library(fastcluster) 
+library(cluster) 
+library(netUtils)   # <-- For LFR benchmark graphs
+library(aricode)
+library(ggplot2)
+library(reshape)
+library(pheatmap)
+
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/sim.R")
 source("/home/bpfeif/GitHub/TopKGraphs/R/calc_SIL.R")
 source("/home/bpfeif/GitHub/TopKGraphs/R/calc_BINARY.R")
@@ -58,25 +68,35 @@ for(xx in 1:n_iter){
     #    main = "Graph with Known Community Structure")
     ######################################################
 
-    # Sizes of the communities
-    sizes <- c(10, 10, 10)
-    n_nodes = sum(sizes)
+   
+  # ----------------------------
+  # Generate LFR benchmark graph in R
+  # ----------------------------
+  n_nodes <- 100
+  avg_degree <- 5
+  max_degree <- 10
+  min_community <- 5
+  max_community <- 50
+  mu <- 0.30 # Mixing parameter
+  tau1 <- 2 #2
+  tau2 <- 1.1 #1.1   # tau2 must be > 1 for netUtils
+  
+  # Sample LFR graph
+  g <- sample_lfr(n = n_nodes,
+                  average_degree = avg_degree,
+                  max_degree = max_degree,
+                  min_community = min_community,
+                  max_community = max_community,
+                  mu = mu,
+                  tau1 = tau1,
+                  tau2 = tau2)
+  
 
-    # Connection probability matrix (3x3)
-    intra = 0.50 # 0.50 is baseline
-    inter = 0.10 # 0.05 is baseline
+  print(table(V(g)$membership))
 
-    pref.matrix <- matrix(c(
-      intra, inter, inter,
-      inter, intra, inter,
-      inter, inter, intra
-    ), nrow = 3, byrow = TRUE)
-
-    # Generate the SBM graph
-    g <- sample_sbm(sum(sizes), pref.matrix, block.sizes = sizes)
-
-    # Assign community membership
-    V(g)$community <- rep(1:length(sizes), times = sizes)
+  # Ground truth communities
+  V(g)$community <- V(g)$membership
+  n_nodes <- vcount(g)
 
     # Remove isolated nodes
     g <- delete_vertices(g, V(g)[degree(g) == 0])
