@@ -36,26 +36,26 @@ source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # -------------------------------
-# 1. Load Breast Cancer dataset
+# Load Ecoli dataset from UCI
 # -------------------------------
-# Option 1: via mlbench package
-# install.packages("mlbench")  # if not installed
-library(mlbench)
-data(BreastCancer, package="mlbench")  # uses column "Class" for labels
+url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data"
 
-# Remove rows with missing values (if any)
-bc <- na.omit(BreastCancer)
+# Column names from the dataset description
+cols <- c("SequenceName", "mcg", "gvh", "lip", "chg", "aac", "alm1", "alm2", "Class")
 
-# Extract numeric features (columns 2-10 in this dataset)
-X <- as.matrix(sapply(bc[, 2:10], as.numeric))
+ecoli <- read.table(url, sep="", col.names = cols, stringsAsFactors = FALSE)
 
-# Class labels: benign = 2, malignant = 1 (or numeric)
-labels_true <- as.numeric(bc$Class)
+# Remove the non-numeric identifier column
+X <- as.matrix(ecoli[, 2:8])
+
+# Extract class labels
+labels_true <- as.numeric(as.factor(ecoli$Class))
 
 n_nodes <- nrow(X)
 
 # Optional: scale features
 X <- scale(X)
+
 
 # -------------------------------
 # 2. Function to create kNN graph
