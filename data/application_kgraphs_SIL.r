@@ -24,18 +24,23 @@ source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 # Load Wine dataset (UCI)
 # -------------------------------
 url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data"
+
+# Column names from UCI description
 cols <- c(
   "Class", "Alcohol", "MalicAcid", "Ash", "AlcalinityAsh",
   "Magnesium", "TotalPhenols", "Flavanoids", "NonflavanoidPhenols",
   "Proanthocyanins", "ColorIntensity", "Hue", "OD280_OD315", "Proline"
 )
+
 wine <- read.table(url, sep = ",", col.names = cols, stringsAsFactors = FALSE)
 
-# Features
+# Features (all except the first column)
 X <- as.matrix(wine[, -1])
 
-# Ground-truth labels
+# Ground-truth class labels
 labels_true <- as.numeric(as.factor(wine$Class))
+
+# Number of samples
 n_nodes <- nrow(X)
 
 # Scale features
@@ -115,7 +120,9 @@ for (idx in seq_along(ks)) {
       do.TopKSignal = FALSE,
       do.RRA = FALSE
     )
-    dist_tkg <- res_tkg$DIST
+    dist_tkg = res_tkg$DIST
+    #dist_tkg = cmdscale(as.dist(dist_tkg), k=10)  # classical MDS
+    #dist_tkg = as.matrix(dist(dist_tkg))
 
     # ---- Jaccard / Dice ----
     jaccard_sim <- similarity(g, method = "jaccard", mode = "all")
