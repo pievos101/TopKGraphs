@@ -14,22 +14,24 @@ source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # -------------------------------
-# Load Ecoli dataset (UCI)
+# Load Wine dataset (UCI)
 # -------------------------------
-url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data"
+url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data"
 
 cols <- c(
-  "SequenceName", "mcg", "gvh", "lip",
-  "chg", "aac", "alm1", "alm2", "Class"
+  "Class", "Alcohol", "MalicAcid", "Ash", "AlcalinityAsh",
+  "Magnesium", "TotalPhenols", "Flavanoids", "NonflavanoidPhenols",
+  "Proanthocyanins", "ColorIntensity", "Hue",
+  "OD280_OD315", "Proline"
 )
 
-ecoli <- read.table(url, sep = "", col.names = cols, stringsAsFactors = FALSE)
+wine <- read.table(url, sep = ",", col.names = cols, stringsAsFactors = FALSE)
 
-# Features (all numeric columns)
-X <- as.matrix(ecoli[, 2:8])
+# Features (all except class)
+X <- as.matrix(wine[, -1])
 
 # Ground-truth labels
-labels_true <- as.numeric(as.factor(ecoli$Class))
+labels_true <- as.numeric(as.factor(wine$Class))
 
 # Number of samples
 n_nodes <- nrow(X)
@@ -39,6 +41,8 @@ X <- scale(X)
 
 # Number of clusters
 n_clusters <- length(unique(labels_true))
+
+
 # ======================================================
 # 3. kNN graph constructor
 # ======================================================
