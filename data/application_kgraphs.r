@@ -1,170 +1,201 @@
 # ======================================================
-# TopKGraphs robustness evaluation on Iris dataset
+# 0. Libraries
 # ======================================================
-
 library(igraph)
 library(ggplot2)
 library(reshape2)
-library(igraph)
-library(ggplot2)
-library(reshape2)
-library(aricode)  # for ARI/NMI
-# Make sure your TopKGraphs functions are loaded: topkgraphs(), etc.
+library(aricode)   # ARI, NMI, AMI
 
-
-source("/home/bpfeif/GitHub/TopKGraphs/R/calc_SIL.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/calc_BINARY.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
-source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_kNN.R")
-source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 # ======================================================
-# TopKGraphs + other methods evaluation on Iris dataset
+# 1. Load TopKGraphs functions
 # ======================================================
-# ======================================================
-# TopKGraphs robustness evaluation on Iris dataset
-# ======================================================
-
-library(igraph)
-library(ggplot2)
-library(reshape2)
-library(aricode)  # for ARI/NMI
-
-# Load TopKGraphs functions
 source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
 source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # -------------------------------
-# Load Ecoli dataset from UCI
+# Load Ecoli dataset (UCI)
 # -------------------------------
 url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data"
 
-# Column names from the dataset description
-cols <- c("SequenceName", "mcg", "gvh", "lip", "chg", "aac", "alm1", "alm2", "Class")
+cols <- c(
+  "SequenceName", "mcg", "gvh", "lip",
+  "chg", "aac", "alm1", "alm2", "Class"
+)
 
-ecoli <- read.table(url, sep="", col.names = cols, stringsAsFactors = FALSE)
+ecoli <- read.table(url, sep = "", col.names = cols, stringsAsFactors = FALSE)
 
-# Remove the non-numeric identifier column
+# Features (all numeric columns)
 X <- as.matrix(ecoli[, 2:8])
 
-# Extract class labels
+# Ground-truth labels
 labels_true <- as.numeric(as.factor(ecoli$Class))
 
+# Number of samples
 n_nodes <- nrow(X)
 
-# Optional: scale features
+# Scale features
 X <- scale(X)
 
-
-# -------------------------------
-# 2. Function to create kNN graph
-# -------------------------------
-create_knn_graph <- function(X, k = 5, metric = "euclidean") {
-  dist_mat <- as.matrix(dist(X, method = metric))
+# Number of clusters
+n_clusters <- length(unique(labels_true))
+# ======================================================
+# 3. kNN graph constructor
+# ======================================================
+create_knn_graph <- function(X, k = 5) {
+  dist_mat <- as.matrix(dist(X))
   g <- make_empty_graph(n = nrow(X), directed = FALSE)
-  for(i in 1:nrow(X)){
-    neighbors <- order(dist_mat[i,])[2:(k+1)]
-    for(j in neighbors){
+  for (i in 1:nrow(X)) {
+    nn <- order(dist_mat[i, ])[2:(k + 1)]
+    for (j in nn) {
       g <- add_edges(g, c(i, j))
     }
   }
-  g <- simplify(g)
-  return(g)
+  simplify(g)
 }
 
-# -------------------------------
-# 3. Evaluate multiple kNN graphs with stability
-# -------------------------------
-ks <- c(3,5,7,10)
+# ======================================================
+# 4. External metrics helper
+# ======================================================
+compute_external_metrics <- function(labels_true, labels_pred) {
+  c(
+    ARI = ARI(labels_true, labels_pred),
+    NMI = NMI(labels_true, labels_pred),
+    AMI = AMI(labels_true, labels_pred)
+  )
+}
+
+# ======================================================
+# 5. Experiment setup
+# ======================================================
+ks <- c(5, 10, 20)
 methods <- c("TopKGraphs", "Jaccard", "Dice", "PageRank", "Node2Vec")
-n_runs <- 10  # number of runs to assess stability
+metrics <- c("ARI", "NMI", "AMI")
+n_runs <- 10
 
-# Store ARI for each run
-ARI_array <- array(NA, dim = c(length(ks), length(methods), n_runs),
-                   dimnames = list(paste0("k=", ks), methods, NULL))
+METRIC_array <- array(
+  NA,
+  dim = c(length(ks), length(methods), n_runs, length(metrics)),
+  dimnames = list(
+    paste0("k=", ks),
+    methods,
+    NULL,
+    metrics
+  )
+)
 
-#set.seed(123)  # reproducibility
+# ======================================================
+# 6. Main loop
+# ======================================================
+for (idx in seq_along(ks)) {
 
-for(idx in seq_along(ks)){
   k <- ks[idx]
   cat("Processing k =", k, "\n")
-  
-  for(run in 1:n_runs){
-    # Optional: add small perturbation/noise to X for robustness check
-    X_perturbed <- X + matrix(rnorm(n_nodes*ncol(X), mean=0, sd=1e-5), n_nodes, ncol(X))
-    
-    # ----- kNN graph -----
+
+  for (run in 1:n_runs) {
+
+    # small perturbation for robustness
+    X_perturbed <- X + matrix(
+      rnorm(n_nodes * ncol(X), sd = 1e-5),
+      n_nodes, ncol(X)
+    )
+
+    # ---- kNN graph ----
     g <- create_knn_graph(X_perturbed, k = k)
-    
-    # ----- TopKGraphs -----
-    res_tkg <- topkgraphs(list(g), walk_depth = 30, n_iter = 50,
-                          do.BORDA = TRUE, do.TopKSignal = FALSE, do.RRA = FALSE)
+
+    # ---- TopKGraphs ----
+    res_tkg <- topkgraphs(
+      list(g),
+      walk_depth = 30,
+      n_iter = 50,
+      do.BORDA = TRUE,
+      do.TopKSignal = FALSE,
+      do.RRA = FALSE
+    )
+
     hc_tkg <- hclust(as.dist(res_tkg$DIST), method = "ward.D2")
-    cl_tkg <- cutree(hc_tkg, k = length(unique(labels_true)))
-    
-    # ----- Jaccard & Dice -----
+    cl_tkg <- cutree(hc_tkg, k = n_clusters)
+
+    METRIC_array[idx, "TopKGraphs", run, ] <-
+      compute_external_metrics(labels_true, cl_tkg)
+
+    # ---- Jaccard / Dice ----
     jaccard_sim <- similarity(g, method = "jaccard", mode = "all")
     dice_sim <- similarity(g, method = "dice", mode = "all")
-    
-    hc_jaccard <- hclust(as.dist(1-jaccard_sim), method = "ward.D2")
-    cl_jaccard <- cutree(hc_jaccard, k = length(unique(labels_true)))
-    
-    hc_dice <- hclust(as.dist(1-dice_sim), method = "ward.D2")
-    cl_dice <- cutree(hc_dice, k = length(unique(labels_true)))
-    
-    # ----- Personalized PageRank -----
+
+    cl_jaccard <- cutree(
+      hclust(as.dist(1 - jaccard_sim), method = "ward.D2"),
+      k = n_clusters
+    )
+    cl_dice <- cutree(
+      hclust(as.dist(1 - dice_sim), method = "ward.D2"),
+      k = n_clusters
+    )
+
+    METRIC_array[idx, "Jaccard", run, ] <-
+      compute_external_metrics(labels_true, cl_jaccard)
+    METRIC_array[idx, "Dice", run, ] <-
+      compute_external_metrics(labels_true, cl_dice)
+
+    # ---- Personalized PageRank ----
     n <- vcount(g)
-    ppr_mat <- sapply(1:n, function(i){
+    ppr_mat <- sapply(seq_len(n), function(i) {
       pers <- rep(0, n)
       pers[i] <- 1
-      page_rank(g, personalized = pers, damping=0.7)$vector
+      page_rank(g, personalized = pers, damping = 0.7)$vector
     })
-    hc_ppr <- hclust(as.dist(1-ppr_mat), method="ward.D2")
-    cl_ppr <- cutree(hc_ppr, k = length(unique(labels_true)))
-    
-    # ----- Node2Vec embeddings -----
+
+    cl_ppr <- cutree(
+      hclust(as.dist(1 - ppr_mat), method = "ward.D2"),
+      k = n_clusters
+    )
+
+    METRIC_array[idx, "PageRank", run, ] <-
+      compute_external_metrics(labels_true, cl_ppr)
+
+    # ---- Node2Vec ----
     node2vec_emb <- call_node2vec(g, walk_length = 30, num_walks = 50)
-    node_order <- round(as.numeric(node2vec_emb[,1]))
-    node2vec_emb <- as.matrix(node2vec_emb[,-1])
-    hc_n2v <- hclust(dist(scale(node2vec_emb)), method = "ward.D2")
-    cl_n2v <- cutree(hc_n2v, k = length(unique(labels_true)))
+    node_order <- round(as.numeric(node2vec_emb[, 1]))
+    emb <- as.matrix(node2vec_emb[, -1])
+
+    hc_n2v <- hclust(dist(scale(emb)), method = "ward.D2")
+    cl_n2v <- cutree(hc_n2v, k = n_clusters)
+
     ids <- match(1:n_nodes, node_order)
     cl_n2v <- cl_n2v[ids]
-    
-    # ----- Store ARI -----
-    ARI_array[idx,"TopKGraphs",run] <- ARI(labels_true, cl_tkg)
-    ARI_array[idx,"Jaccard",run]   <- ARI(labels_true, cl_jaccard)
-    ARI_array[idx,"Dice",run]      <- ARI(labels_true, cl_dice)
-    ARI_array[idx,"PageRank",run]  <- ARI(labels_true, cl_ppr)
-    ARI_array[idx,"Node2Vec",run]  <- ARI(labels_true, cl_n2v)
-  
-  print(ARI_array)
+
+    METRIC_array[idx, "Node2Vec", run, ] <-
+      compute_external_metrics(labels_true, cl_n2v)
+
+      print(METRIC_array)
   }
-  
 }
 
-# -------------------------------
-# 4. Compute mean + SD across runs
-# -------------------------------
-ARI_mean <- apply(ARI_array, c(1,2), mean)
-ARI_sd   <- apply(ARI_array, c(1,2), sd)
+# ======================================================
+# 7. Aggregate results
+# ======================================================
+METRIC_mean <- apply(METRIC_array, c(1, 2, 4), mean, na.rm = TRUE)
+METRIC_sd   <- apply(METRIC_array, c(1, 2, 4), sd, na.rm = TRUE)
 
-ARI_df <- data.frame(
-  k = rep(ks, each = length(methods)),
-  Method = rep(methods, times = length(ks)),
-  ARI_mean = as.vector(t(ARI_mean)),
-  ARI_sd   = as.vector(t(ARI_sd))
-)
-# -------------------------------
-# 5. Visualize mean ± SD
-# -------------------------------
-ggplot(ARI_df, aes(x = factor(k), y = ARI_mean, fill = Method)) +
-  geom_bar(stat="identity", position="dodge") +
-  geom_errorbar(aes(ymin = ARI_mean - ARI_sd, ymax = ARI_mean + ARI_sd),
-                width = 0.2, position=position_dodge(0.9)) +
-  ylim(0,1) +
-  labs(title = "Clustering performance (ARI) across kNN graphs with stability",
-       x = "k (kNN graph)", y = "Adjusted Rand Index") +
+METRIC_df <- melt(METRIC_mean)
+colnames(METRIC_df) <- c("k", "Method", "Metric", "Mean")
+METRIC_df$SD <- as.vector(METRIC_sd)
+
+# ======================================================
+# 8. Plot
+# ======================================================
+ggplot(METRIC_df, aes(x = k, y = Mean, fill = Method)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_errorbar(
+    aes(ymin = Mean - SD, ymax = Mean + SD),
+    width = 0.2,
+    position = position_dodge(0.9)
+  ) +
+  facet_wrap(~ Metric, scales = "free_y") +
   theme_minimal() +
-  scale_fill_brewer(palette = "Set2")
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "External clustering performance on Iris dataset",
+    x = "k (kNN graph)",
+    y = "Score"
+  )

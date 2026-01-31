@@ -21,24 +21,30 @@ source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # -------------------------------
-# Load Wine dataset (UCI)
+# Load Ecoli dataset (UCI)
 # -------------------------------
-url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data"
+url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data"
 
 # Column names from UCI description
 cols <- c(
-  "Class", "Alcohol", "MalicAcid", "Ash", "AlcalinityAsh",
-  "Magnesium", "TotalPhenols", "Flavanoids", "NonflavanoidPhenols",
-  "Proanthocyanins", "ColorIntensity", "Hue", "OD280_OD315", "Proline"
+  "SequenceName",
+  "mcg", "gvh", "lip", "chg",
+  "aac", "alm1", "alm2",
+  "Class"
 )
 
-wine <- read.table(url, sep = ",", col.names = cols, stringsAsFactors = FALSE)
+ecoli <- read.table(
+  url,
+  sep = "",
+  col.names = cols,
+  stringsAsFactors = FALSE
+)
 
-# Features (all except the first column)
-X <- as.matrix(wine[, -1])
+# Features (exclude sequence name and class)
+X <- as.matrix(ecoli[, 2:8])
 
 # Ground-truth class labels
-labels_true <- as.numeric(as.factor(wine$Class))
+labels_true <- as.numeric(as.factor(ecoli$Class))
 
 # Number of samples
 n_nodes <- nrow(X)
@@ -82,7 +88,7 @@ davies_bouldin <- function(dist_mat, labels) {
 # -------------------------------
 # Experiment setup
 # -------------------------------
-ks <- c(3, 5, 7, 10)
+ks <- c(5, 10, 20)
 methods <- c("TopKGraphs", "Jaccard", "Dice", "PageRank", "Node2Vec")
 n_runs <- 10
 metrics <- c("Silhouette", "CalinskiHarabasz", "DaviesBouldin")
@@ -121,9 +127,7 @@ for (idx in seq_along(ks)) {
       do.RRA = FALSE
     )
     dist_tkg = res_tkg$DIST
-    #dist_tkg = cmdscale(as.dist(dist_tkg), k=10)  # classical MDS
-    #dist_tkg = as.matrix(dist(dist_tkg))
-
+    
     # ---- Jaccard / Dice ----
     jaccard_sim <- similarity(g, method = "jaccard", mode = "all")
     dice_sim <- similarity(g, method = "dice", mode = "all")
