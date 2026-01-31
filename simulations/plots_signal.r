@@ -1,3 +1,39 @@
+one = read.table("03_mu_kNN.txt")
+two = read.table("05_mu_kNN.txt")
+three = read.table("10_mu_kNN.txt")
+four = read.table("20_mu_kNN.txt")
+five = read.table("30_mu_kNN.txt")
+
+L = list()
+L[[1]] = one
+L[[2]] = two
+L[[3]] = three
+L[[4]] = four
+L[[5]] = five
+
+library(reshape)
+library(ggplot2)
+
+L_melt = melt(L)
+colnames(L_melt) = c("Method","value","signal")
+L_melt$signal = factor(L_melt$signal, 
+		labels=c("0.03","0.05","0.10","0.20","0.30"))
+
+p1 = ggplot(L_melt, aes(x = signal, y = value, fill = Method)) +
+  geom_boxplot(outlier.shape = NA, outlier.fill = "white", outlier.color = "black") +
+  theme_minimal(base_size = 14) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Classification performance",
+    y = "Accuracy",
+    x = "Fraction of inter-community edges"
+  ) #+
+  #theme(legend.position = "none")
+
+print(p1)
+
+#####
+
 one = read.table("03_mu.txt")
 two = read.table("05_mu.txt")
 three = read.table("10_mu.txt")

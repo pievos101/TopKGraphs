@@ -77,7 +77,7 @@ for(xx in 1:n_iter){
   max_degree <- 10
   min_community <- 5
   max_community <- 50
-  mu <- 0.30 # Mixing parameter
+  mu <- 0.03 # Mixing parameter
   tau1 <- 2 #2
   tau2 <- 1.1 #1.1   # tau2 must be > 1 for netUtils
   
@@ -178,7 +178,7 @@ for(xx in 1:n_iter){
 
     #library(aricode)
     #membership_gt <- rep(1:num_communities, each = nodes_per_community)
-    membership_gt = rep(1:length(sizes), times = sizes)
+    #membership_gt = rep(1:length(sizes), times = sizes)
 
     library(caret)
     all_levels <- sort(unique(c(knn_topkgraphs[[1]],knn_topkgraphs[[2]])))
