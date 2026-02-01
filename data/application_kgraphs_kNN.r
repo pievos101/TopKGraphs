@@ -74,7 +74,7 @@ safe_accuracy <- function(pred, truth) {
 # ------------------------------------------------------
 # Experiment parameters
 # ------------------------------------------------------
-ks <- c(3, 5, 7, 10)    # kNN graph sizes
+ks <- c(5, 7, 10)      # kNN graph sizes
 setK <- 10             # kNN classifier
 n_runs <- 10           # robustness runs
 

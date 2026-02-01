@@ -14,24 +14,22 @@ source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # -------------------------------
-# Load Wine dataset (UCI)
+# Load Breast Cancer dataset (UCI)
 # -------------------------------
-url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data"
+url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data"
 
 cols <- c(
-  "Class", "Alcohol", "MalicAcid", "Ash", "AlcalinityAsh",
-  "Magnesium", "TotalPhenols", "Flavanoids", "NonflavanoidPhenols",
-  "Proanthocyanins", "ColorIntensity", "Hue",
-  "OD280_OD315", "Proline"
+  "ID", "Diagnosis",
+  paste0("Feature", 1:30)
 )
 
-wine <- read.table(url, sep = ",", col.names = cols, stringsAsFactors = FALSE)
+bc <- read.table(url, sep = ",", col.names = cols, stringsAsFactors = FALSE)
 
-# Features (all except class)
-X <- as.matrix(wine[, -1])
+# Features (exclude ID and Diagnosis)
+X <- as.matrix(bc[, -c(1, 2)])
 
-# Ground-truth labels
-labels_true <- as.numeric(as.factor(wine$Class))
+# Ground-truth labels (M = malignant, B = benign)
+labels_true <- as.numeric(as.factor(bc$Diagnosis))
 
 # Number of samples
 n_nodes <- nrow(X)
@@ -72,7 +70,7 @@ compute_external_metrics <- function(labels_true, labels_pred) {
 # ======================================================
 # 5. Experiment setup
 # ======================================================
-ks <- c(5, 10, 20)
+ks <- c(5, 7, 10)
 methods <- c("TopKGraphs", "Jaccard", "Dice", "PageRank", "Node2Vec")
 metrics <- c("ARI", "NMI", "AMI")
 n_runs <- 10

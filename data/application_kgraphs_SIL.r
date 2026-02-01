@@ -21,30 +21,29 @@ source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # -------------------------------
-# Load Ecoli dataset (UCI)
+# Load Breast Cancer dataset (UCI)
 # -------------------------------
-url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/ecoli/ecoli.data"
+url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data"
 
 # Column names from UCI description
 cols <- c(
-  "SequenceName",
-  "mcg", "gvh", "lip", "chg",
-  "aac", "alm1", "alm2",
-  "Class"
+  "ID",
+  "Diagnosis",
+  paste0("Feature", 1:30)
 )
 
-ecoli <- read.table(
+bc <- read.table(
   url,
-  sep = "",
+  sep = ",",
   col.names = cols,
   stringsAsFactors = FALSE
 )
 
-# Features (exclude sequence name and class)
-X <- as.matrix(ecoli[, 2:8])
+# Features (exclude ID and diagnosis)
+X <- as.matrix(bc[, -c(1, 2)])
 
-# Ground-truth class labels
-labels_true <- as.numeric(as.factor(ecoli$Class))
+# Ground-truth class labels (M / B)
+labels_true <- as.numeric(as.factor(bc$Diagnosis))
 
 # Number of samples
 n_nodes <- nrow(X)
@@ -88,7 +87,7 @@ davies_bouldin <- function(dist_mat, labels) {
 # -------------------------------
 # Experiment setup
 # -------------------------------
-ks <- c(5, 10, 20)
+ks <- c(5, 7, 10)
 methods <- c("TopKGraphs", "Jaccard", "Dice", "PageRank", "Node2Vec")
 n_runs <- 10
 metrics <- c("Silhouette", "CalinskiHarabasz", "DaviesBouldin")
