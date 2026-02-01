@@ -58,14 +58,14 @@ y_test  = y[test_idx]
 if precomputed == 1:
     knn = KNeighborsClassifier(
         n_neighbors=k,
-        metric='precomputed'#,
-        #weights='distance'
+        metric='precomputed',
+        weights='distance'
     )
 # KNN with precomputed distances
 if precomputed == 0:
     knn = KNeighborsClassifier(
-        n_neighbors=k#,
-        #weights='distance'   
+        n_neighbors=k,
+        weights='distance'   
     )
 
 knn.fit(D_train, y_train)

@@ -75,7 +75,7 @@ safe_accuracy <- function(pred, truth) {
 # Experiment parameters
 # ------------------------------------------------------
 ks <- c(5, 7, 10)      # kNN graph sizes
-setK <- 10             # kNN classifier
+setK <- 5             # kNN classifier
 n_runs <- 10           # robustness runs
 
 methods <- c(
@@ -108,7 +108,7 @@ for (idx in seq_along(ks)) {
     g <- create_knn_graph(X_perturbed, k = k_graph)
 
     # ---- TopKGraphs ----
-    res_tkg <- topkgraphs(list(g), walk_depth = 30, n_iter = 50)
+    res_tkg <- topkgraphs(list(g), walk_depth = 50, n_iter = 50)
     dist_tkg <- res_tkg$DIST
 
     # ---- Jaccard / Dice ----
@@ -124,7 +124,7 @@ for (idx in seq_along(ks)) {
     })
 
     # ---- Node2Vec ----
-    node2vec_emb <- call_node2vec(g, walk_length = 30, num_walks = 50)
+    node2vec_emb <- call_node2vec(g, walk_length = 50, num_walks = 50)
     node_order <- round(as.numeric(node2vec_emb[, 1]))
     ids <- match(1:n_nodes, node_order)
     node2vec_emb <- as.matrix(node2vec_emb[ids, -1])
