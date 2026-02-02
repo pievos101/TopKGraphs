@@ -9,9 +9,9 @@ library(aricode)   # ARI, NMI, AMI
 # ======================================================
 # 1. Load TopKGraphs functions
 # ======================================================
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
-source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
+source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # -------------------------------
 # Load Breast Cancer dataset (UCI)

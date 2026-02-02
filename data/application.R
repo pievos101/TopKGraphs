@@ -1,7 +1,58 @@
 # Citeseer
-edge_mat = read.table("Citeseer/citeseer_edge_matrix.csv", sep=",")
-node_labels = read.table("Citeseer/citeseer_node_labels.csv")
-node_labels = unlist(node_labels)
+#edge_mat = read.table("Citeseer/citeseer_edge_matrix.csv", sep=",")
+#node_labels = read.table("Citeseer/citeseer_node_labels.csv")
+#node_labels = unlist(node_labels)
+
+library(igraph)
+
+# Paths
+content_path <- "cora_data/cora/cora.content"
+cites_path   <- "cora_data/cora/cora.cites"
+
+# ---------------------------
+# 1. Load nodes & labels
+# ---------------------------
+nodes <- read.table(content_path, stringsAsFactors = FALSE, sep = "\t")
+node_ids <- nodes[, 1]               # paper IDs
+labels_true <- as.factor(nodes[, ncol(nodes)])  # last column = class label
+
+# Map node IDs -> consecutive integers (igraph vertex IDs)
+id_map <- setNames(seq_along(node_ids), node_ids)
+
+# ---------------------------
+# 2. Load edges & remap IDs
+# ---------------------------
+edges_raw <- read.table(cites_path, stringsAsFactors = FALSE, sep = "")
+colnames(edges_raw) <- c("from", "to")
+
+edges_mapped <- data.frame(
+  from = id_map[as.character(edges_raw$from)],
+  to   = id_map[as.character(edges_raw$to)]
+)
+
+# Remove edges with missing nodes (external nodes)
+edges_mapped <- na.omit(edges_mapped)
+
+# ---------------------------
+# 3. Build undirected igraph
+# ---------------------------
+g <- graph_from_edgelist(as.matrix(edges_mapped), directed = FALSE)
+
+# ---------------------------
+# 4. Attach labels to graph vertices
+# ---------------------------
+V(g)$label <- labels_true  # now labels align with vertices 1:n
+
+# ---------------------------
+# 5. Report
+# ---------------------------
+cat("Nodes:", vcount(g), "\nEdges:", ecount(g), "\nClasses:", 
+    length(unique(labels_true)), "\n")
+
+
+
+node_labels = labels_true
+edge_mat = edges_mapped
 
 
 n_runs = 30
@@ -39,10 +90,13 @@ for(yy in 1:n_runs){
     # Extract the largest component
     largest <- induced_subgraph(g, which(components$membership == which.max(components$csize)))
 
+    cat("Nodes:", vcount(largest), "\nEdges:", ecount(largest), "\nClasses:", 
+    length(unique(labels_true)), "\n")
+
 
     ## CALL TopKGraphs
     ###################################
-    res = topkgraphs(list(largest), walk_depth=200, n_iter=50, n_cores=5)
+    res = topkgraphs(list(largest), walk_depth=20, n_iter=50, n_cores=5)
 
     # clustering
     hc = hclust(as.dist(res$DIST), method="ward.D2")
@@ -72,7 +126,7 @@ for(yy in 1:n_runs){
     ## CALL Node2Vec
     ###################################
     source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
-    node2vec_emb = call_node2vec(largest, walk_length=30, num_walks=50)
+    node2vec_emb = call_node2vec(largest, walk_length=20, num_walks=50)
 
     #print(dim(node2vec_emb))
     node_order = round(as.numeric(rownames(node2vec_emb)))
