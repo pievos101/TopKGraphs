@@ -61,11 +61,11 @@ for(xx in 1:n_iter){
     ######################################################
 
     # Sizes of the communities
-    sizes = c(20,20,20) #sample(c(5,10,20),3,replace=TRUE) #c(10, 20, 5)
+    sizes = c(10,10,10) #sample(c(5,10,20),3,replace=TRUE) #c(10, 20, 5)
     n_nodes = sum(sizes)
 
     # Connection probability matrix (3x3)
-    intra = 0.20 # 0.50 is baseline
+    intra = 0.40 # 0.50 is baseline
     inter = 0.05 # 0.05 is baseline
 
     pref.matrix <- matrix(c(

@@ -90,7 +90,7 @@ for(yy in 1:n_runs){
     # Extract the largest component
     #largest <- induced_subgraph(g, which(components$membership == which.max(components$csize)))
 
-    n_sub <- 100
+    n_sub <- 50
 
     #print("Where is the error?")
     nodes = 1
@@ -104,6 +104,7 @@ for(yy in 1:n_runs){
     #print(unique(nodes))
     
     nodes <- unique(nodes)[1:n_sub]
+
     #print("YO")
     #print(nodes)
 
