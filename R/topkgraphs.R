@@ -3,7 +3,7 @@ library(TopKLists)
 library(igraph)
 #source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 
-topkgraphs <- function(views, walk_depth=20, n_iter=50, 
+topkgraphs <- function(views, walk_depth=50, n_iter=50, 
                                  n_cores=NaN, agg_method="mean",
                                  do.BORDA = TRUE, 
                                  do.TopKSignal=FALSE,

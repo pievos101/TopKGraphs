@@ -97,7 +97,7 @@ for(yy in 1:n_runs){
     # Extract the largest component
     #largest <- induced_subgraph(g, which(components$membership == which.max(components$csize)))
 
-    n_sub <- 50
+    n_sub <- 200
 
     #print("Where is the error?")
     nodes = 1
