@@ -197,7 +197,7 @@ ggplot(METRIC_df, aes(x = k, y = Mean, fill = Method)) +
   theme_minimal() +
   scale_fill_brewer(palette = "Set2") +
   labs(
-    title = "External clustering performance on Iris dataset",
+    title = "Clustering performance on BreastCancer dataset",
     x = "k (kNN graph)",
     y = "Score"
   )

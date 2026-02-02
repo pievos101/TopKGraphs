@@ -102,7 +102,7 @@ for (xx in 1:length(RES)){
 }
 
 if(do.BORDA){
-DIST = DIST/max(DIST, na.rm=TRUE)
+#DIST = DIST/max(DIST, na.rm=TRUE)
 }
 
 if(do.TopKSignal){
@@ -118,8 +118,8 @@ DIST[is.na(DIST)] <- max(DIST, na.rm=TRUE)
 diag(DIST) <- 0
 DIST <- (DIST + t(DIST)) / 2  # symmetrize
 
-#coords <- cmdscale(as.dist(DIST), k=5)  # 10D embedding
-#DIST <- as.matrix(dist(coords))
+coords <- cmdscale(as.dist(DIST), k=10)  # 10D embedding
+DIST <- as.matrix(dist(coords))
 
 return(list(RES=RES, DIST=DIST))
 

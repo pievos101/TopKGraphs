@@ -14,11 +14,11 @@ library(clusterCrit)   # internal cluster quality metrics
 # -------------------------------
 # Load TopKGraphs functions
 # -------------------------------
-source("/home/bpfeif/GitHub/TopKGraphs/R/calc_SIL.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/calc_BINARY.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
-source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
-source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
+source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
+source("/home/bastian/GitHub/TopKGraphs/R/calc_BINARY.R")
+source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # -------------------------------
 # Load Breast Cancer dataset (UCI)

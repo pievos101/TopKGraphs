@@ -1,4 +1,4 @@
-DATASET = "CITESEER"
+DATASET = "CORA"
 
 library(igraph)
 
