@@ -8,7 +8,7 @@ use_virtualenv("r-reticulate", required = FALSE)  # or use_python("/usr/bin/pyth
 py_install(c("node2vec", "networkx", "pandas"), pip = TRUE)
 
 # TODO -- make walk_length and num_walks params of the function
-call_node2vec <- function(g, walk_length=20, num_walks=10, dimensions=64){
+call_node2vec <- function(g, walk_length=20, num_walks=10, dimensions=128){
 
 
 walk_length = as.integer(walk_length)

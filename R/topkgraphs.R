@@ -114,11 +114,11 @@ if(do.RRA){
 DIST = DIST/max(DIST, na.rm=TRUE)
 }
 
-DIST[is.na(DIST)] <- max(DIST, na.rm=TRUE)
+DIST[is.na(DIST)] <- 1 #max(DIST, na.rm=TRUE)
 diag(DIST) <- 0
 DIST <- (DIST + t(DIST)) / 2  # symmetrize
 
-#coords <- cmdscale(as.dist(DIST), k=10)  # 10D embedding
+#coords <- cmdscale(as.dist(DIST), k=50)  # 10D embedding
 #DIST <- as.matrix(dist(coords))
 
 return(list(RES=RES, DIST=DIST))
