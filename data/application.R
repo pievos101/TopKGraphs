@@ -1,9 +1,15 @@
-# Citeseer
-#edge_mat = read.table("Citeseer/citeseer_edge_matrix.csv", sep=",")
-#node_labels = read.table("Citeseer/citeseer_node_labels.csv")
-#node_labels = unlist(node_labels)
+DATASET = "CITESEER"
 
 library(igraph)
+
+if(DATASET=="CITESEER"){
+# Citeseer
+edge_mat = read.table("Citeseer/citeseer_edge_matrix.csv", sep=",")
+node_labels = read.table("Citeseer/citeseer_node_labels.csv")
+node_labels = unlist(node_labels)
+}
+
+if(DATASET=="CORA"){
 
 # Paths
 content_path <- "cora_data/cora/cora.content"
@@ -54,6 +60,7 @@ cat("Nodes:", vcount(g), "\nEdges:", ecount(g), "\nClasses:",
 node_labels = labels_true
 edge_mat = edges_mapped
 
+}
 
 n_runs = 30
 
@@ -99,6 +106,7 @@ for(yy in 1:n_runs){
                      steps = n_sub * 100,
                      mode = "all")
     }
+
     #print("Äh")
     #print(nodes)
     #print(unique(nodes))
@@ -111,8 +119,9 @@ for(yy in 1:n_runs){
     # Induced subgraph
     largest <- induced_subgraph(g, nodes)
 
-    V(largest)$community = droplevels(V(largest)$community)
-
+    if(DATASET=="CORA"){
+        V(largest)$community = droplevels(V(largest)$community)
+    }
 
     print(table(V(largest)$community))
     
@@ -120,8 +129,8 @@ for(yy in 1:n_runs){
     #plot(sub_g)
 
 
-    cat("Nodes:", vcount(largest), "\nEdges:", ecount(largest), "\nClasses:", 
-    length(unique(labels_true)), "\n")
+    #cat("Nodes:", vcount(largest), "\nEdges:", ecount(largest), "\nClasses:", 
+    #length(unique(labels_true)), "\n")
 
 
     ## CALL TopKGraphs
