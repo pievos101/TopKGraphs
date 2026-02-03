@@ -52,6 +52,10 @@ valid = which(!is.na(labels))
 X_rna_2  = X_rna[valid, ]
 labels_2 = labels[valid]
 
+# Remove Normal-like and HER2-enriched
+iii = which(labels_2=="Normal-like" | labels_2=="HER2-enriched")
+X_rna_2 = X_rna_2[-iii,]
+labels_2 = labels_2[-iii]
 
 k <- length(unique(labels_2))
 cat("Number of classes:", k, "\n")
@@ -81,7 +85,7 @@ build_knn_graph <- function(X, k = 10){
   graph_from_adjacency_matrix(A, mode = "undirected")
 }
 
-g_rna <- build_knn_graph(X_rna_3, 10)
+g_rna <- build_knn_graph(X_rna_3, 20)
 graphs <- list(g_rna)
 
 # ======================================================
@@ -96,7 +100,7 @@ Rcpp::sourceCpp("/home/bastian/GitHub/TopKGraphs/src/walk_with_jaccard_degree_sa
 # ======================================================
 res <- topkgraphs(
   views = graphs,
-  walk_depth = 200,
+  walk_depth = 300,
   n_iter = 100,
   do.BORDA = TRUE,
   n_cores=5
@@ -117,7 +121,8 @@ cat("Adjusted Rand Index (ARI):", ARI, "\n")
 cat("Normalized Mutual Information (NMI):", NMI, "\n")
 
 
-P = cbind(res$coords[,1:2],labels_2)
+P = cbind(cmdscale(res$DIST_raw,2),labels_2)
+
 P_df <- data.frame(
   x = as.numeric(P[, 1]),
   y = as.numeric(P[, 2]),
