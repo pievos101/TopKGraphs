@@ -83,6 +83,26 @@ top_low_var <- function(X, top_p = 1000, low_p = 1000){
 # Apply to your RNA matrix
 X_rna_3 <- top_low_var(X_rna_2, top_p = 100, low_p = 100)
 
+######################################
+# 3.1 ADD noise
+######################################
+
+add_noise <- function(X, noise_sd = 0.1){
+  # noise_sd = fraction of gene standard deviation
+  gene_sds <- apply(X, 2, sd)
+  
+  noise <- matrix(rnorm(nrow(X) * ncol(X)), nrow = nrow(X), ncol = ncol(X))
+  noise <- sweep(noise, 2, gene_sds * noise_sd, `*`)  # scale per gene
+  
+  X_noisy <- X + noise
+  return(X_noisy)
+}
+
+# Apply to your top/low variance matrix
+# X_rna_3 <- add_noise(X_rna_3, noise_sd = 2)  # 10% of gene SD
+
+
+
 # ======================================================
 # 4. Build kNN graphs per omics
 # ======================================================
@@ -97,7 +117,7 @@ build_knn_graph <- function(X, k = 10){
   graph_from_adjacency_matrix(A, mode = "undirected")
 }
 
-g_rna <- build_knn_graph(X_rna_3, 3)
+g_rna <- build_knn_graph(X_rna_3, 10)
 graphs <- list(g_rna)
 
 # ======================================================
@@ -112,8 +132,8 @@ Rcpp::sourceCpp("/home/bastian/GitHub/TopKGraphs/src/walk_with_jaccard_degree_sa
 # ======================================================
 res <- topkgraphs(
   views = graphs,
-  walk_depth = 200,
-  n_iter = 200,
+  walk_depth = 30,
+  n_iter = 100,
   do.BORDA = TRUE,
   n_cores=5
 )
