@@ -85,7 +85,7 @@ build_knn_graph <- function(X, k = 10){
   graph_from_adjacency_matrix(A, mode = "undirected")
 }
 
-g_rna <- build_knn_graph(X_rna_3, 20)
+g_rna <- build_knn_graph(X_rna_3, 3)
 graphs <- list(g_rna)
 
 # ======================================================
@@ -100,8 +100,8 @@ Rcpp::sourceCpp("/home/bastian/GitHub/TopKGraphs/src/walk_with_jaccard_degree_sa
 # ======================================================
 res <- topkgraphs(
   views = graphs,
-  walk_depth = 300,
-  n_iter = 100,
+  walk_depth = 100,
+  n_iter = 200,
   do.BORDA = TRUE,
   n_cores=5
 )
@@ -112,14 +112,25 @@ res <- topkgraphs(
 hc <- hclust(as.dist(res$DIST), method = "ward.D2")
 cl_topk <- cutree(hc, k = k)
 
+hc_base = hclust(dist(scale(X_rna_3)), method = "ward.D2")
+cl_base = cutree(hc_base, k = k)
+
+
 # ======================================================
 # 8. Evaluation
 # ======================================================
+
+print("--------------------")
 ARI <- ARI(cl_topk, labels_2)
 NMI <- NMI(cl_topk, labels_2)
-cat("Adjusted Rand Index (ARI):", ARI, "\n")
-cat("Normalized Mutual Information (NMI):", NMI, "\n")
-
+cat("TopKGraphs: Adjusted Rand Index (ARI):", ARI, "\n")
+cat("TopKGraphs: Normalized Mutual Information (NMI):", NMI, "\n")
+print("------------")
+ARI <- ARI(cl_base, labels_2)
+NMI <- NMI(cl_base, labels_2)
+cat("BASE: Adjusted Rand Index (ARI):", ARI, "\n")
+cat("BASE: Normalized Mutual Information (NMI):", NMI, "\n")
+print("-----------------")
 
 P = cbind(cmdscale(res$DIST_raw,2),labels_2)
 
