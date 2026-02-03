@@ -209,6 +209,7 @@ for(yy in 1:n_runs){
 print(KNN_array)
 
 } # end runs
+
 library(ggplot2)
 library(reshape2)
 library(gridExtra)

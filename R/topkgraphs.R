@@ -121,7 +121,7 @@ DIST <- (DIST + t(DIST)) / 2  # symmetrize
 coords <- cmdscale(as.dist(DIST), k=10)  # 10D embedding
 DIST <- as.matrix(dist(coords))
 
-return(list(RES=RES, DIST=DIST))
+return(list(RES=RES, DIST=DIST, coords=coords))
 
 }
 
