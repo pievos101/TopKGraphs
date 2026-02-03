@@ -97,7 +97,7 @@ for(yy in 1:n_runs){
     # Extract the largest component
     #largest <- induced_subgraph(g, which(components$membership == which.max(components$csize)))
 
-    n_sub <- 200
+    n_sub <- 100
 
     #print("Where is the error?")
     nodes = 1
@@ -135,7 +135,7 @@ for(yy in 1:n_runs){
 
     ## CALL TopKGraphs
     ###################################
-    res = topkgraphs(list(largest), walk_depth=30, n_iter=50, n_cores=NaN)
+    res = topkgraphs(list(largest), walk_depth=50, n_iter=50, n_cores=NaN)
 
     # clustering
     hc = hclust(as.dist(res$DIST), method="ward.D2")
@@ -165,7 +165,7 @@ for(yy in 1:n_runs){
     ## CALL Node2Vec
     ###################################
     source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
-    node2vec_emb = call_node2vec(largest, walk_length=30, num_walks=50)
+    node2vec_emb = call_node2vec(largest, walk_length=50, num_walks=50)
 
     #print(dim(node2vec_emb))
     node_order = round(as.numeric(rownames(node2vec_emb)))
@@ -208,48 +208,85 @@ for(yy in 1:n_runs){
 
     ### CHECK the performance with varying k in kNN.
 
-   # K = c(3,5,10,20,30,50)
+    K = c(5, 7, 10)
 
-    #RES = matrix(NaN,2,length(K))
-    #rownames(RES) = c("TopKGraphs","Node2Vec")
-    #colnames(RES) = K
+    RES = matrix(NaN,2,length(K))
+    rownames(RES) = c("TopKGraphs","Node2Vec")
+    colnames(RES) = K
 
-   # for(xx in 1:length(K)){
+    library(caret)
+
+    for(xx in 1:length(K)){
 
         # Call TopKgraphs
-        #knn_topkgraphs = call_kNN_dist(res$DIST, V(largest)$community, k = K[xx])
+        knn_topkgraphs = call_kNN_dist(res$DIST, V(largest)$community, k = K[xx])
         
-        #all_levels <- sort(unique(c(knn_topkgraphs[[1]],knn_topkgraphs[[2]])))
-        #cm_topkgraphs = confusionMatrix(factor(knn_topkgraphs[[1]], levels=all_levels), 
-         #                               factor(knn_topkgraphs[[2]], levels=all_levels))
+        all_levels <- sort(unique(c(knn_topkgraphs[[1]],knn_topkgraphs[[2]])))
+        cm_topkgraphs = confusionMatrix(factor(knn_topkgraphs[[1]], levels=all_levels), 
+                                        factor(knn_topkgraphs[[2]], levels=all_levels))
 
-        #bacc_topkgraphs = mean(cm_topkgraphs$byClass[, "Balanced Accuracy"],
-        #                                na.rm = TRUE)
+        if(is.null(dim(cm_topkgraphs$byClass)[1])){
+            bacc_topkgraphs = cm_topkgraphs$byClass["Balanced Accuracy"]
+        }else{
+            bacc_topkgraphs = mean(cm_topkgraphs$byClass[, "Balanced Accuracy"],
+                                        na.rm = TRUE)
+        }
 
-        #RES[1, xx] = bacc_topkgraphs
+        RES[1, xx] = bacc_topkgraphs
 
         # Call Node2Vec
-        #knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb[ids,-1]))),
-        #                                V(largest)$community, k = K[xx])
+        knn_node2vec = call_kNN_dist(as.matrix(dist(scale(node2vec_emb[ids,-1]))),
+                                        V(largest)$community, k = K[xx])
 
-        #all_levels <- sort(unique(c(knn_node2vec[[1]],knn_node2vec[[2]])))
-        #cm_node2vec = confusionMatrix(factor(knn_node2vec[[1]], levels=all_levels), 
-        #                                    factor(knn_node2vec[[2]], levels=all_levels))
+        all_levels <- sort(unique(c(knn_node2vec[[1]],knn_node2vec[[2]])))
+        cm_node2vec = confusionMatrix(factor(knn_node2vec[[1]], levels=all_levels), 
+                                            factor(knn_node2vec[[2]], levels=all_levels))
                                             
-        #bacc_node2vec <- mean(cm_node2vec$byClass[, "Balanced Accuracy"], na.rm = TRUE)
+        if(is.null(dim(cm_node2vec$byClass)[1])){
+            bacc_node2vec <- cm_node2vec$byClass["Balanced Accuracy"]
+        }else{
+            bacc_node2vec <- mean(cm_node2vec$byClass[, "Balanced Accuracy"], na.rm = TRUE)
+        }
 
-        #RES[2, xx] = bacc_node2vec
+        RES[2, xx] = bacc_node2vec
 
     #print(RES)
 
-    #}
+    }
 
-#RES_list[[yy]] = RES
+RES_list[[yy]] = RES
 
-#print(RES_list)
+print(RES_list)
 print("ARI")
 print(ARI_res)
 print("NMI")
 print(NMI_res)
 }
 ### Plots
+
+
+library(reshape2)
+library(ggplot2)
+
+df <- melt(RES_list)
+
+# Rename for clarity
+colnames(df) <- c("Method", "K", "Run", "Score")
+
+ggplot(df, aes(x = factor(K), y = Run, fill = Method)) +
+  geom_boxplot(
+    position = position_dodge(width = 0.75),
+    width = 0.6,
+    outlier.alpha = 0.6
+  ) +
+  labs(
+    title = "",
+    x = "K",
+    y = "Accuracy",
+    fill = "Method"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "top"
+  )
