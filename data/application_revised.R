@@ -67,11 +67,11 @@ if(DATASET=="CORA"){
 # ======================================================
 # 4. Experiment setup
 # ======================================================
-n_runs <- 30
+n_runs <- 50
 methods <- c("TopKGraphs","Node2Vec","Jaccard","Dice","PageRank")
 metrics <- c("ARI","NMI","AMI")
 K_vals <- c(5,7,10)
-n_nodes_sub <- 100
+n_nodes_sub <- 200
 
 # Arrays to store results
 CLUSTER_array <- array(NA, dim=c(n_runs, length(methods), length(metrics)),
@@ -102,14 +102,14 @@ for(yy in 1:n_runs){
   # -----------------------
   # 5b. TopKGraphs
   # -----------------------
-  res_tkg <- topkgraphs(list(sub_g), walk_depth=50, n_iter=50, n_cores=NaN)
+  res_tkg <- topkgraphs(list(sub_g), walk_depth=100, n_iter=50, n_cores=NaN)
   hc_tkg <- hclust(as.dist(res_tkg$DIST), method="ward.D2")
   cl_tkg <- cutree(hc_tkg, length(unique(V(sub_g)$community)))
 
   # -----------------------
   # 5c. Node2Vec
   # -----------------------
-  node2vec_emb <- call_node2vec(sub_g, walk_length=50, num_walks=50)
+  node2vec_emb <- call_node2vec(sub_g, walk_length=100, num_walks=50)
   node_order <- round(as.numeric(rownames(node2vec_emb)))
   emb <- matrix(as.numeric(unlist(node2vec_emb)), nrow=nrow(node2vec_emb))
   ids <- match(1:vcount(sub_g), node_order)
