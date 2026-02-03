@@ -64,12 +64,24 @@ table(labels_2)
 # ======================================================
 # 3. Feature filtering (top variable features)
 # ======================================================
-top_var <- function(X, p = 1000){
+top_low_var <- function(X, top_p = 1000, low_p = 1000){
+  # Compute variance for each gene
   vars <- rowVars(t(X))
-  X[, order(vars, decreasing = TRUE)[1:p]]
+  
+  # Indices of top variable genes
+  top_idx <- order(vars, decreasing = TRUE)[1:top_p]
+  
+  # Indices of lowest variable genes
+  low_idx <- order(vars, decreasing = FALSE)[1:low_p]
+  
+  # Subset matrix: combine top + low
+  X_subset <- X[, c(top_idx, low_idx)]
+  
+  return(X_subset)
 }
 
-X_rna_3 <- top_var(X_rna_2, 1000)
+# Apply to your RNA matrix
+X_rna_3 <- top_low_var(X_rna_2, top_p = 100, low_p = 100)
 
 # ======================================================
 # 4. Build kNN graphs per omics
@@ -100,7 +112,7 @@ Rcpp::sourceCpp("/home/bastian/GitHub/TopKGraphs/src/walk_with_jaccard_degree_sa
 # ======================================================
 res <- topkgraphs(
   views = graphs,
-  walk_depth = 100,
+  walk_depth = 200,
   n_iter = 200,
   do.BORDA = TRUE,
   n_cores=5
@@ -158,13 +170,33 @@ ggplot(P_df, aes(x = x, y = y, color = label)) +
     panel.grid.minor = element_blank()
   )
 
-# ======================================================
-# 9. Optional: visualize distance matrix
-# ======================================================
+
 library(pheatmap)
-pheatmap(res$DIST,
-         clustering_distance_rows = "euclidean",
-         clustering_distance_cols = "euclidean",
-         main = "TopKGraphs Patient Similarity",
-         show_rownames = FALSE,
-         show_colnames = FALSE)
+
+# Create annotation data frame
+ann_row <- data.frame(
+  PAM50 = factor(labels_2)
+)
+rownames(ann_row) <- rownames(res$DIST)  # make sure rownames match distance matrix
+
+# Define colors for your exact labels
+ann_colors <- list(
+  PAM50 = c(
+    `Basal-like` = "#E41A1C",   # red
+    `Luminal A`  = "#377EB8",   # blue
+    `Luminal B`  = "#4DAF4A"    # green
+  )
+)
+
+# Plot heatmap with annotation
+pheatmap(
+  res$DIST,
+  clustering_distance_rows = "euclidean",
+  clustering_distance_cols = "euclidean",
+  annotation_row = ann_row,
+  annotation_col = ann_row,
+  annotation_colors = ann_colors,
+  show_rownames = FALSE,
+  show_colnames = FALSE,
+  main = "TopKGraphs Patient Similarity with PAM50 Annotation"
+)

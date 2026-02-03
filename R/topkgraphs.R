@@ -35,7 +35,7 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
     require(foreach)
     require(doParallel)
 
-    ncores <- parallel::detectCores() - 1
+    ncores <- parallel::detectCores() - 3
     cl <- makeCluster(ncores)
 
     # Register the cluster
