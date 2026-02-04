@@ -83,31 +83,39 @@ top_low_var <- function(X, top_p = 1000, low_p = 1000){
 # Apply to your RNA matrix
 X_rna_3 <- top_low_var(X_rna_2, top_p = 100, low_p = 100)
 
-######################################
+# ====================================
 # 3.1 ADD noise
-######################################
+# ====================================
 
-add_noise <- function(X, noise_sd = 0.1){
-  # noise_sd = fraction of gene standard deviation
-  gene_sds <- apply(X, 2, sd)
-  
-  noise <- matrix(rnorm(nrow(X) * ncol(X)), nrow = nrow(X), ncol = ncol(X))
-  noise <- sweep(noise, 2, gene_sds * noise_sd, `*`)  # scale per gene
-  
-  X_noisy <- X + noise
-  return(X_noisy)
+add_monotone_noise <- function(X, strength = 1.5){
+  Xn <- X
+  p <- ncol(X)
+
+  for(j in 1:p){
+    a <- runif(1, 0.5, strength)
+    b <- runif(1, -1, 1)
+
+    # monotone but nonlinear
+    Xn[, j] <- sign(X[, j]) * abs(X[, j])^a + b
+  }
+
+  return(Xn)
 }
 
-# Apply to your top/low variance matrix
-# X_rna_3 <- add_noise(X_rna_3, noise_sd = 2)  # 10% of gene SD
 
 
+#X_rna_3_scaled = scale()
+# SCALING
+#################################
+X_rna_3_scaled <- scale(X_rna_3)
+
+#X_rna_3 <- add_monotone_noise(X_rna_3, strength = 5)
 
 # ======================================================
 # 4. Build kNN graphs per omics
 # ======================================================
 build_knn_graph <- function(X, k = 10){
-  D <- as.matrix(dist(scale(X)))
+  D <- as.matrix(dist(X))
   A <- matrix(0, nrow(X), nrow(X))
   for(i in 1:nrow(X)){
     nn <- order(D[i, ])[2:(k+1)]
@@ -117,7 +125,7 @@ build_knn_graph <- function(X, k = 10){
   graph_from_adjacency_matrix(A, mode = "undirected")
 }
 
-g_rna <- build_knn_graph(X_rna_3, 10)
+g_rna <- build_knn_graph(X_rna_3_scaled, 5)
 graphs <- list(g_rna)
 
 # ======================================================
@@ -144,7 +152,7 @@ res <- topkgraphs(
 hc <- hclust(as.dist(res$DIST), method = "ward.D2")
 cl_topk <- cutree(hc, k = k)
 
-hc_base = hclust(dist(scale(X_rna_3)), method = "ward.D2")
+hc_base = hclust(dist(X_rna_3_scaled), method = "ward.D2")
 cl_base = cutree(hc_base, k = k)
 
 
