@@ -43,7 +43,7 @@ edges <- edges[!is.na(edges$gene1) & !is.na(edges$gene2), ]
 PPI = edges[,c("gene1","gene2","combined_score")]
 
 # filter 
-ids = which(PPI[,"combined_score"]>=950)
+ids = which(PPI[,"combined_score"]>=990)
 PPI_sub = PPI[ids,]
 
 ##################################
@@ -121,7 +121,7 @@ cat("Largest component:",
     ecount(g_largest), "edges\n")
 
 # Delete small communities 
-ids = which(table(V(g_largest)$community)<50)
+ids = which(table(V(g_largest)$community)<20)
 nn  = names(table(V(g_largest)$community))[ids]
 
 idx_remove <- which(is.element(V(g_largest)$community, nn))

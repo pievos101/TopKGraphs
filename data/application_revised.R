@@ -104,13 +104,14 @@ for(yy in 1:n_runs){
   # -----------------------
   # 5a. Subgraph sampling
   # -----------------------
-  nodes_sample <- 1
-  while(length(unique(nodes_sample)) < n_nodes_sub){
-    nodes_sample <- random_walk(g, start=sample(V(g),1),
-                                steps=n_nodes_sub*100, mode="all")
-  }
-  nodes_sample <- unique(nodes_sample)[1:n_nodes_sub]
-  sub_g <- induced_subgraph(g, nodes_sample)
+  #nodes_sample <- 1
+  #while(length(unique(nodes_sample)) < n_nodes_sub){
+  #  nodes_sample <- random_walk(g, start=sample(V(g),1),
+  #                              steps=n_nodes_sub*100, mode="all")
+  #}
+  #nodes_sample <- unique(nodes_sample)[1:n_nodes_sub]
+  #sub_g <- induced_subgraph(g, nodes_sample)
+  sub_g = g
   V(sub_g)$community <- droplevels(V(sub_g)$label)
   all_levels <- levels(V(sub_g)$community)  # for kNN factors
   #print(all_levels)
@@ -119,14 +120,14 @@ for(yy in 1:n_runs){
   # -----------------------
   # 5b. TopKGraphs
   # -----------------------
-  res_tkg <- topkgraphs(list(sub_g), walk_depth=50, n_iter=50, n_cores=NaN)
+  res_tkg <- topkgraphs(list(sub_g), walk_depth=10, n_iter=50, n_cores=NaN)
   hc_tkg <- hclust(as.dist(res_tkg$DIST), method="ward.D2")
   cl_tkg <- cutree(hc_tkg, length(unique(V(sub_g)$community)))
 
   # -----------------------
   # 5c. Node2Vec
   # -----------------------
-  node2vec_emb <- call_node2vec(sub_g, walk_length=50, num_walks=50)
+  node2vec_emb <- call_node2vec(sub_g, walk_length=10, num_walks=50)
   node_order <- round(as.numeric(rownames(node2vec_emb)))
   emb <- matrix(as.numeric(unlist(node2vec_emb)), nrow=nrow(node2vec_emb))
   ids <- match(V(sub_g)$name, node_order)
