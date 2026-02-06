@@ -67,7 +67,7 @@ if(DATASET=="CORA"){
 if(DATASET=="PPI"){
 
   # g_largest 
-  load("PPI_990.RD")
+  load("PPI_sub.RD")
   g = g_largest
   V(g)$community <- as.factor(V(g)$community)
   V(g)$label <- as.factor(V(g)$community)
@@ -85,7 +85,7 @@ n_runs <- 50
 methods <- c("TopKGraphs","Node2Vec","Jaccard","Dice","PageRank")
 metrics <- c("ARI","NMI","AMI")
 K_vals <- c(5,7,10)
-n_nodes_sub <- 200
+n_nodes_sub <- 100
 
 # Arrays to store results
 CLUSTER_array <- array(NA, dim=c(n_runs, length(methods), length(metrics)),
@@ -114,6 +114,7 @@ for(yy in 1:n_runs){
   V(sub_g)$community <- droplevels(V(sub_g)$label)
   all_levels <- levels(V(sub_g)$community)  # for kNN factors
   #print(all_levels)
+  print(table(V(sub_g)$community))
 
   # -----------------------
   # 5b. TopKGraphs
