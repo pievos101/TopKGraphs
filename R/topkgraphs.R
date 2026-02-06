@@ -42,7 +42,7 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
     registerDoParallel(cl)
 
     require(Rcpp)
-    Rcpp::sourceCpp("/home/bastian/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
+    Rcpp::sourceCpp("/home/bpfeif/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
 
     RES = foreach(xx = 1:n_nodes, .combine = c,
                     .export = "topkgraphs_walk",

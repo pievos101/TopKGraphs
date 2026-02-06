@@ -10,10 +10,10 @@ library(caret)     # confusionMatrix
 # ======================================================
 # 1. Load TopKGraphs functions
 # ======================================================
-source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
-source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
-source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
-source("/home/bastian/GitHub/TopKGraphs/simulations/call_kNN.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
+source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_kNN.R")
 
 # ======================================================
 # 2. External metrics helper
@@ -29,7 +29,7 @@ compute_external_metrics <- function(labels_true, labels_pred) {
 # ======================================================
 # 3. Load dataset: CORA
 # ======================================================
-DATASET <- "CORA"
+DATASET <- "PPI"
 
 if(DATASET=="CORA"){
 
@@ -64,6 +64,20 @@ if(DATASET=="CORA"){
   edge_mat <- edges_mapped
 }
 
+if(DATASET=="PPI"){
+
+  # g_largest 
+  load("PPI_990.RD")
+  g = g_largest
+  V(g)$community <- as.factor(V(g)$community)
+  V(g)$label <- as.factor(V(g)$community)
+  node_labels <- as.factor(V(g)$label)
+  V(g)$gene_name <- V(g)$name   # backup
+  V(g)$name <- as.character(seq_len(vcount(g)))
+
+
+}
+
 # ======================================================
 # 4. Experiment setup
 # ======================================================
@@ -85,6 +99,7 @@ KNN_array     <- array(NA, dim=c(n_runs, length(methods), length(K_vals)),
 for(yy in 1:n_runs){
 
   cat("Run:", yy, "\n")
+  print(DATASET)
 
   # -----------------------
   # 5a. Subgraph sampling
@@ -98,21 +113,22 @@ for(yy in 1:n_runs){
   sub_g <- induced_subgraph(g, nodes_sample)
   V(sub_g)$community <- droplevels(V(sub_g)$label)
   all_levels <- levels(V(sub_g)$community)  # for kNN factors
+  #print(all_levels)
 
   # -----------------------
   # 5b. TopKGraphs
   # -----------------------
-  res_tkg <- topkgraphs(list(sub_g), walk_depth=100, n_iter=50, n_cores=NaN)
+  res_tkg <- topkgraphs(list(sub_g), walk_depth=50, n_iter=50, n_cores=NaN)
   hc_tkg <- hclust(as.dist(res_tkg$DIST), method="ward.D2")
   cl_tkg <- cutree(hc_tkg, length(unique(V(sub_g)$community)))
 
   # -----------------------
   # 5c. Node2Vec
   # -----------------------
-  node2vec_emb <- call_node2vec(sub_g, walk_length=100, num_walks=50)
+  node2vec_emb <- call_node2vec(sub_g, walk_length=50, num_walks=50)
   node_order <- round(as.numeric(rownames(node2vec_emb)))
   emb <- matrix(as.numeric(unlist(node2vec_emb)), nrow=nrow(node2vec_emb))
-  ids <- match(1:vcount(sub_g), node_order)
+  ids <- match(V(sub_g)$name, node_order)
   hc_n2v <- hclust(dist(scale(emb[ids,-1])), method="ward.D2")
   cl_n2v <- cutree(hc_n2v, length(unique(V(sub_g)$community)))
 
