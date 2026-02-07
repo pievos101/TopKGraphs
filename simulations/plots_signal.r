@@ -15,9 +15,27 @@ library(ggplot2)
 
 L_melt = melt(L)
 colnames(L_melt) = c("Method", "value", "signal")
+
+
+# Reorder factor (includes Laplace even if missing)
+L_melt$Method <- factor(L_melt$Method, 
+levels = c("TopKGraphs", "Node2Vec", 
+"Jaccard", "Dice", "PageRank", "Laplacian"))
+
 keep_methods <- c("TopKGraphs", "Node2Vec")
 
 L_melt <- L_melt[L_melt$Method %in% keep_methods, ]
+
+
+custom_colors <- c(
+  "TopKGraphs" = "#F8766D",  # reddish
+  "Node2Vec"   = "#B79F00"  # yellow‑brownish / military‑greenish
+  #"Jaccard"    = "#00ba7c",  # greenish
+  #"Dice"       = "#00BFC4",  # cyan/teal
+  #"PageRank"   = "#C77CFF",  # lila / purple
+  #"Laplacian"  = "#FDE725"   # yellowish
+)
+
 
 L_melt$signal = factor(
   L_melt$signal,
@@ -55,9 +73,9 @@ p1 <- ggplot(summary_df,
     linewidth = 0.7
   ) +
   theme_minimal(base_size = 14) +
-  scale_color_brewer(palette = "Set2") +
+  scale_color_manual(values = custom_colors) + 
   labs(
-    title = "Clustering performance",
+    #title = "Clustering performance",
     y = "Adjusted R-Index",
     x = "Walk Length"
   )
@@ -120,15 +138,32 @@ library(ggplot2)
 
 L_melt = melt(L)
 colnames(L_melt) = c("Method","value","signal")
+
+
+# Reorder factor (includes Laplace even if missing)
+L_melt$Method <- factor(L_melt$Method, 
+levels = c("TopKGraphs", "Node2Vec", 
+"Jaccard", "Dice", "PageRank", "Laplacian"))
+
+custom_colors <- c(
+  "TopKGraphs" = "#F8766D",  # reddish
+  "Node2Vec"   = "#B79F00",  # yellow‑brownish / military‑greenish
+  "Jaccard"    = "#00ba7c",  # greenish
+  "Dice"       = "#00BFC4",  # cyan/teal
+  "PageRank"   = "#C77CFF",  # lila / purple
+  "Laplacian"  = "#FDE725"   # yellowish
+)
+
 L_melt$signal = factor(L_melt$signal, 
 		labels=c("0.03","0.05","0.10","0.20","0.30"))
 
 p1 = ggplot(L_melt, aes(x = signal, y = value, fill = Method)) +
   geom_boxplot(outlier.shape = NA, outlier.fill = "white", outlier.color = "black") +
   theme_minimal(base_size = 14) +
-  scale_fill_brewer(palette = "Set2") +
+  scale_fill_manual(values = custom_colors) +
+  #scale_fill_brewer(palette = "Set2") +
   labs(
-    title = "Clustering performance",
+    #title = "Clustering performance",
     y = "Adjusted R-Index (ARI)",
     x = "Fraction of inter-community edges"
   ) #+
@@ -190,15 +225,32 @@ library(ggplot2)
 
 L_melt = melt(L)
 colnames(L_melt) = c("Method","value","signal")
+
+# Reorder factor (includes Laplace even if missing)
+L_melt$Method <- factor(L_melt$Method, 
+levels = c("TopKGraphs", "Node2Vec", 
+"Jaccard", "Dice", "PageRank", "Laplacian"))
+
+custom_colors <- c(
+  "TopKGraphs" = "#F8766D",  # reddish
+  "Node2Vec"   = "#B79F00",  # yellow‑brownish / military‑greenish
+  "Jaccard"    = "#00ba7c",  # greenish
+  "Dice"       = "#00BFC4",  # cyan/teal
+  "PageRank"   = "#C77CFF",  # lila / purple
+  "Laplacian"  = "#FDE725"   # yellowish
+)
+
+
 L_melt$signal = factor(L_melt$signal, 
 		labels=c("0.01","0.05","0.10","0.20","0.30"))
 
 p1 = ggplot(L_melt, aes(x = signal, y = value, fill = Method)) +
   geom_boxplot(outlier.shape = NA, outlier.fill = "white", outlier.color = "black") +
   theme_minimal(base_size = 14) +
-  scale_fill_brewer(palette = "Set2") +
+  scale_fill_manual(values = custom_colors) +
+  #scale_fill_brewer(palette = "Set2") +
   labs(
-    title = "Clustering performance",
+    #title = "Clustering performance",
     y = "Adjusted R-Index (ARI)",
     x = "Inter-cluster edge probability"
   ) #+
@@ -227,15 +279,30 @@ library(ggplot2)
 
 L_melt = melt(L)
 colnames(L_melt) = c("Method","value","signal")
+
+# Reorder factor (includes Laplace even if missing)
+L_melt$Method <- factor(L_melt$Method, 
+levels = c("TopKGraphs", "Node2Vec", 
+"Jaccard", "Dice", "PageRank", "Laplacian"))
+
+custom_colors <- c(
+  "TopKGraphs" = "#F8766D",  # reddish
+  "Node2Vec"   = "#B79F00",  # yellow‑brownish / military‑greenish
+  "Jaccard"    = "#00ba7c",  # greenish
+  "Dice"       = "#00BFC4",  # cyan/teal
+  "PageRank"   = "#C77CFF",  # lila / purple
+  "Laplacian"  = "#FDE725"   # yellowish
+)
+
 L_melt$signal = factor(L_melt$signal, 
 		labels=c("0.10","0.20","0.30","0.40","0.50"))
 
 p1 = ggplot(L_melt, aes(x = signal, y = value, fill = Method)) +
   geom_boxplot(outlier.shape = NA, outlier.fill = "white", outlier.color = "black") +
   theme_minimal(base_size = 14) +
-  scale_fill_brewer(palette = "Set2") +
+  scale_fill_manual(values = custom_colors) +
   labs(
-    title = "Clustering performance",
+    #title = "Clustering performance",
     y = "Adjusted R-Index (ARI)",
     x = "Intra-cluster edge probability"
   ) #+
