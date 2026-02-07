@@ -9,12 +9,12 @@ library(reshape)
 library(pheatmap)
 
 # Load custom functions
-source("/home/bastian/GitHub/TopKGraphs/simulations/sim.R")
-source("/home/bastian/GitHub/TopKGraphs/R/calc_SIL.R")
-source("/home/bastian/GitHub/TopKGraphs/R/calc_BINARY.R")
-source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs.R")
-source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
-source("/home/bastian/GitHub/TopKGraphs/simulations/call_node2vec.R")
+source("/home/bpfeif/GitHub/TopKGraphs/simulations/sim.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/calc_SIL.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/calc_BINARY.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
 # Set seed for reproducibility
 set.seed(123)
@@ -47,7 +47,7 @@ for(xx in 1:n_iter){
   max_degree <- 10
   min_community <- 5
   max_community <- 50
-  mu <- 0.20 # Mixing parameter
+  mu <- 0.05 # Mixing parameter
   tau1 <- 2 #2
   tau2 <- 1.1 #1.1   # tau2 must be > 1 for netUtils
   
@@ -75,7 +75,7 @@ for(xx in 1:n_iter){
   # ----------------------------
   # TopKGraphs
   # ----------------------------
-  res <- topkgraphs(list(g), walk_depth=30, n_iter=50, 
+  res <- topkgraphs(list(g), walk_depth=100, n_iter=50, 
                     do.BORDA = TRUE,
                     do.TopKSignal = FALSE,
                     do.RRA = FALSE)
@@ -94,7 +94,8 @@ for(xx in 1:n_iter){
   emb <- eig$vectors
   
   # Node2Vec embedding
-  node2vec_emb <- call_node2vec(g, walk_length=30, num_walks=50)
+  node2vec_emb <- call_node2vec(g, walk_length=100, num_walks=50)
+
   node_order <- round(as.numeric(node2vec_emb[,1]))
   node2vec_emb <- as.matrix(node2vec_emb[,-1])
   ids <- match(1:n_nodes, node_order)

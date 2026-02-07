@@ -1,0 +1,22 @@
+# ----------------------------
+  # Generate LFR benchmark graph in R
+  # ----------------------------
+  n_nodes <- 100
+  avg_degree <- 5
+  max_degree <- 10
+  min_community <- 5
+  max_community <- 50
+  mu <- 0.05 # Mixing parameter
+  tau1 <- 2 #2
+  tau2 <- 1.1 #1.1   # tau2 must be > 1 for netUtils
+  
+  # Sample LFR graph
+  g <- sample_lfr(n = n_nodes,
+                  average_degree = avg_degree,
+                  max_degree = max_degree,
+                  min_community = min_community,
+                  max_community = max_community,
+                  mu = mu,
+                  tau1 = tau1,
+                  tau2 = tau2)
+  

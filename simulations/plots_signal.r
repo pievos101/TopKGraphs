@@ -1,3 +1,71 @@
+one = read.table("05_wl.txt")
+two = read.table("10_wl.txt")
+three = read.table("20_wl.txt")
+four = read.table("50_wl.txt")
+five = read.table("100_wl.txt")
+
+L = list()
+L[[1]] = one
+L[[2]] = two
+L[[3]] = three
+L[[4]] = four
+L[[5]] = five
+library(reshape)
+library(ggplot2)
+
+L_melt = melt(L)
+colnames(L_melt) = c("Method", "value", "signal")
+keep_methods <- c("TopKGraphs", "Node2Vec")
+
+L_melt <- L_melt[L_melt$Method %in% keep_methods, ]
+
+L_melt$signal = factor(
+  L_melt$signal,
+  labels = c("5", "10", "20", "50", "100")
+)
+
+# Mean
+mean_df <- aggregate(
+  value ~ Method + signal,
+  data = L_melt,
+  FUN = mean
+)
+
+# Standard error
+se_df <- aggregate(
+  value ~ Method + signal,
+  data = L_melt,
+  FUN = function(x) sd(x) / sqrt(length(x))
+)
+
+# Merge mean and SE
+summary_df <- merge(mean_df, se_df,
+                    by = c("Method", "signal"),
+                    suffixes = c("_mean", "_se"))
+
+p1 <- ggplot(summary_df,
+             aes(x = signal, y = value_mean,
+                 group = Method, color = Method)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 3) +
+  geom_errorbar(
+    aes(ymin = value_mean - value_se,
+        ymax = value_mean + value_se),
+    width = 0.15,
+    linewidth = 0.7
+  ) +
+  theme_minimal(base_size = 14) +
+  scale_color_brewer(palette = "Set2") +
+  labs(
+    title = "Clustering performance",
+    y = "Adjusted R-Index",
+    x = "Walk Length"
+  )
+
+print(p1)
+##################################
+
+
 one = read.table("03_mu_kNN.txt")
 two = read.table("05_mu_kNN.txt")
 three = read.table("10_mu_kNN.txt")
