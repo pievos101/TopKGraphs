@@ -13,6 +13,7 @@ source("/home/bpfeif/GitHub/TopKGraphs/simulations/sim.R")
 source("/home/bpfeif/GitHub/TopKGraphs/R/calc_SIL.R")
 source("/home/bpfeif/GitHub/TopKGraphs/R/calc_BINARY.R")
 source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs2.R")
 source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 
@@ -75,10 +76,7 @@ for(xx in 1:n_iter){
   # ----------------------------
   # TopKGraphs
   # ----------------------------
-  res <- topkgraphs(list(g), walk_depth=100, n_iter=50, 
-                    do.BORDA = TRUE,
-                    do.TopKSignal = FALSE,
-                    do.RRA = FALSE)
+  res <- topkgraphs(list(g), walk_depth=100, n_iter=50)
   
   topkgraphs_sim <- 1 - res$DIST
   

@@ -11,6 +11,7 @@ library(caret)     # confusionMatrix
 # 1. Load TopKGraphs functions
 # ======================================================
 source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs.R")
+source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs2.R")
 source("/home/bpfeif/GitHub/TopKGraphs/R/topkgraphs_walk.R")
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_node2vec.R")
 source("/home/bpfeif/GitHub/TopKGraphs/simulations/call_kNN.R")
