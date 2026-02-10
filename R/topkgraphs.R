@@ -1,16 +1,27 @@
-library(TopKLists)
-#library(TopKSignal)
-library(igraph)
-#source("/home/bastian/GitHub/TopKGraphs/R/topkgraphs_walk.R")
+#' TopKGraphs
+#'
+#' Compute node affinities using Jaccard-anchored random walks
+#'
+#' @param views List of graphs or adjacency matrices
+#' @param walk_depth Integer walk length
+#' @param n_iter Number of walks
+#' @param n_cores Number of cores (NA = serial)
+#' @param agg_method Aggregation method
+#' @return List with RES, DIST, DIST_raw
+#'
+#' @export
+
 
 topkgraphs <- function(views, walk_depth=50, n_iter=50, 
-                                 n_cores=NaN, agg_method="mean",
-                                 do.BORDA = TRUE, 
-                                 do.TopKSignal=FALSE,
-                                 do.RRA=FALSE){
+                                 n_cores=NaN, agg_method="mean"){
 
+ do.BORDA = TRUE
+ do.TopKSignal = FALSE
+ do.RRA = FALSE
+ 
  RES = list()
  
+
  if(!(is(views[[1]])[1]=="igraph")){
     n_nodes = nrow(views[[1]])
  }else{
@@ -25,10 +36,7 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
         RES[[xx]] = topkgraphs_walk(views, 
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
-                                n_iter=n_iter,
-                                do.BORDA=do.BORDA, 
-                                do.TopKSignal=do.TopKSignal,
-                                do.RRA=do.RRA)
+                                n_iter=n_iter)
     }
  }else{ # parallel computation
  
@@ -41,9 +49,6 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
     # Register the cluster
     registerDoParallel(cl)
 
-    require(Rcpp)
-    Rcpp::sourceCpp("/home/bpfeif/GitHub/TopKGraphs/src/walk_with_jaccard_degree_safe.cpp")
-
     RES = foreach(xx = 1:n_nodes, .combine = c,
                     .export = "topkgraphs_walk",
                     .packages = c("igraph","TopKLists") ) %dopar% {
@@ -51,9 +56,7 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
                                 n_iter=n_iter,
-                                do.BORDA=do.BORDA, 
-                                do.TopKSignal=do.TopKSignal,
-                                do.RRA=do.RRA))
+                                ))
     }
  }
 
