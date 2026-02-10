@@ -79,10 +79,9 @@ cat("Jaccard:   ", round(ari_jaccard, 3), "\n")
 ```
 
 ## Visualizing Node Affinities
-
-```r
 You can visualize the graph embeddings derived from TopKGraphs:
 
+```r
 coords <- cmdscale(as.dist(res$DIST_raw), k = 2)
 plot(coords, col = V(g)$community, pch = 19,
      main = "2D Embedding from TopKGraphs Distances")
