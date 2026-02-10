@@ -64,27 +64,17 @@ for(ii in 1:length(views)){
 # Concatenate the walks from the multi-view graphs
 WALKS = Reduce('cbind', WALKSALL) 
 
-#print(WALKS)
-
 #res1 = apply(WALKS, 2, table, simplify=FALSE)
-
-#print(res1)
 
 #res2 = sapply(res1, sort, decreasing=TRUE, simplify=FALSE)
 
 res3 = apply(WALKS, 2, unique, simplify=FALSE)
 
-
-#print(res2)
 #n_nodes1 = length(unique(as.numeric(unlist(sapply(res2, names)))))
 n_nodes2 = length(unique(unlist(res3)))
-#print(unique(unlist(res2)))
 #n_nodes = unique(c(n_nodes1, n_nodes2))
-#print(n_nodes)
-#print(ncol(WALKS))
 
 #rankMatrix1 = matrix(NaN, n_nodes1, ncol(WALKS))
-#print(rankMatrix)
 rankMatrix2 = matrix(NaN, n_nodes2, ncol(WALKS))
 
 # Fill the rank matrix
@@ -98,17 +88,15 @@ for (xx in 1:ncol(WALKS)){
 rankMatrix = rankMatrix2 # cbind(rankMatrix1, rankMatrix2)
 
 ##########################################################
-IS_NEEDED = FALSE # Not needed for Borda
+IS_NEEDED = FALSE # Not needed for Borda!!!
 
 if(IS_NEEDED){
-#print(rankMatrix)
 
 # check missings
 
 values = unique(as.vector(rankMatrix))
 na_ids = which(rankMatrix=="NaN", arr.ind=TRUE)
 na_cols = unique(na_ids[,2])
-
 
 
 for(xx in 1:length(na_cols)){
@@ -137,36 +125,22 @@ for(xx in 1:length(na_cols)){
 
 ### check for remaining NaNs
 
-#print(rankMatrix)
-
-#print(rankMatrix)
-#print(dim(rankMatrix))
-#print(length(unique(as.vector(rankMatrix))))
-#print(unique(as.vector(rankMatrix)))
-
-
 #na_ids = which(rankMatrix=="NaN", arr.ind=TRUE)
 #na_rows = unique(na_ids[,1])
 
-#print(na_rows)
 
 #if(length(na_rows)!=0){
 #    rankMatrix = rankMatrix[-na_rows,]
     #print("There are remaining NaN's")
 #}
 
-#print(rankMatrix)
 
 # Check the correctness of that! @FIXME
 # BORDA ---------------------------------------- #
 #print("BORDA")
 #rankMatrix2 <- apply(rankMatrix,2, function(x) match(1:length(x),x))
 
-#print(rankMatrix2)
-
 #rankMatrix2 <- matrix(as.character(rankMatrix2), dim(rankMatrix2)[1],dim(rankMatrix2)[2])
-
-#print(rankMatrix2)
 
 rankMatrix2 = rankMatrix
 borda.res = NaN
@@ -191,7 +165,7 @@ TKSrank_median   <- match(1:length(TKSrank_median),as.numeric(TKSrank_median))
 # geo.mean
 TKSrank_geomean   <- borda.res$TopK$geo.mean
 TKSrank_geomean   <- match(1:length(TKSrank_geomean),as.numeric(TKSrank_geomean))
-#print(length(TKSrank))
+
 # ---------------------------------------------- #
 
 }
