@@ -6,8 +6,6 @@ library(TopKGraphs)
 library(aricode)
 library(netUtils)   # <-- For LFR benchmark graphs
 
-set.seed(123)
-
 # ----------------------------
 # Generate a small benchmark graph
 # ----------------------------
@@ -17,7 +15,7 @@ g <- sample_lfr(
   max_degree = 12,
   min_community = 10,
   max_community = 30,
-  mu = 0.1,
+  mu = 0.2,
   tau1 = 2,
   tau2 = 1.2
 )
@@ -32,7 +30,7 @@ g <- delete_vertices(g, V(g)[degree(g) == 0])
 res <- topkgraphs(
   views = list(g),
   walk_depth = 50,
-  n_iter = 30
+  n_iter = 50
 )
 
 # Convert distance to similarity

@@ -97,6 +97,9 @@ for (xx in 1:ncol(WALKS)){
 
 rankMatrix = rankMatrix2 # cbind(rankMatrix1, rankMatrix2)
 
+IS_NEEDED = FALSE # Not needed for Borda
+
+if(IS_NEEDED){
 #print(rankMatrix)
 
 # check missings
@@ -145,6 +148,8 @@ for(xx in 1:length(na_cols)){
   # print(rankMatrix)
 
 }
+
+}# Not Needed for Borda!!!! 
 
 ### check for remaining NaNs
 
