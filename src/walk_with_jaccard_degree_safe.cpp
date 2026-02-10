@@ -1,6 +1,102 @@
 #include <Rcpp.h>
 #include <unordered_set>
+#include <random>
 using namespace Rcpp;
+
+// [[Rcpp::export]]
+IntegerMatrix walk_with_jaccard_fast(
+    List adj_list,
+    int start_node,
+    int walk_depth = 20,
+    int n_iter = 50,
+    double eps = 1e-3
+) {
+  int n = adj_list.size();
+  double alpha = 0.0;
+  double beta = 0.0;
+
+  // Precompute degrees and neighbor sets
+  std::vector<int> deg(n);
+  std::vector<std::unordered_set<int>> neighbors_set(n);
+
+  for (int i = 0; i < n; i++) {
+    IntegerVector nei = adj_list[i];
+    deg[i] = nei.size();
+    neighbors_set[i].insert(nei.begin(), nei.end());
+  }
+
+  std::unordered_set<int> start_neighbors(neighbors_set[start_node - 1].begin(),
+                                          neighbors_set[start_node - 1].end());
+
+  // Random number generator
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(0.0, 1.0);
+
+  IntegerMatrix WALKS(walk_depth + 1, n_iter);
+
+  for (int iter = 0; iter < n_iter; iter++) {
+    std::vector<int> walk(walk_depth + 1);
+    walk[0] = start_node;
+    int current = start_node;
+
+    for (int i = 1; i <= walk_depth; i++) {
+
+      if (dis(gen) < alpha) {  // restart
+        current = start_node;
+        walk[i] = current;
+        continue;
+      }
+
+      auto &cur_neigh = neighbors_set[current - 1];
+      int m = cur_neigh.size();
+      if (m == 0) {  // no neighbors, restart
+        current = start_node;
+        walk[i] = current;
+        continue;
+      }
+
+      std::vector<int> neigh_vec(cur_neigh.begin(), cur_neigh.end());
+      std::vector<double> weights(m);
+
+      // Compute weights
+      for (int j = 0; j < m; j++) {
+        int v = neigh_vec[j];
+        auto &v_neigh = neighbors_set[v - 1];
+
+        // intersection size
+        int inter_len = 0;
+        for (int u : v_neigh)
+          if (start_neighbors.count(u)) inter_len++;
+
+        int union_len = v_neigh.size() + start_neighbors.size() - inter_len;
+        double jaccard = (union_len == 0) ? 0.0 : (double) inter_len / union_len;
+
+        int d = std::max(deg[v - 1], 1);
+        weights[j] = (1.0 / std::pow(d, beta)) * (jaccard + eps);
+      }
+
+      // Normalize weights
+      double sum_w = 0.0;
+      for (double w : weights) sum_w += w;
+      if (sum_w <= 0.0 || !R_finite(sum_w)) sum_w = 1.0;
+      for (double &w : weights) w /= sum_w;
+
+      // Weighted sample
+      std::discrete_distribution<> dd(weights.begin(), weights.end());
+      current = neigh_vec[dd(gen)];
+
+      walk[i] = current;
+    }
+
+    for (int row = 0; row <= walk_depth; row++)
+      WALKS(row, iter) = walk[row];
+  }
+
+  return WALKS;
+}
+
+
 
 // [[Rcpp::export]]
 IntegerMatrix walk_with_jaccard_degree_safe_cpp(

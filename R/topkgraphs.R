@@ -43,22 +43,21 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
     require(foreach)
     require(doParallel)
 
-    ncores <- parallel::detectCores() - 3
+    ncores <- parallel::detectCores() - 2
     cl <- makeCluster(ncores)
 
     # Register the cluster
     registerDoParallel(cl)
 
-    RES = foreach(xx = 1:n_nodes, .combine = c,
-                    .export = "topkgraphs_walk",
-                    .packages = c("igraph","TopKLists") ) %dopar% {
-                     list(topkgraphs_walk(views, 
-                                start_node=xx, 
-                                walk_depth=walk_depth, 
-                                n_iter=n_iter,
-                                ))
-    }
- }
+    
+    RES = foreach(xx = 1:n_nodes, .combine = c, 
+      .packages = c("igraph","TopKLists")) %dopar% {
+        list(topkgraphs_walk(views, start_node=xx, 
+        walk_depth=walk_depth, n_iter=n_iter))
+         }
+
+    stopCluster(cl)
+}
 
 # Convert to distance matrix
 DIST = matrix(NaN, length(RES), length(RES))
