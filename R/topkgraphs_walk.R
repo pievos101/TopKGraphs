@@ -190,8 +190,11 @@ IN          <- lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
 
 IN = lapply(IN, function(x){as.numeric(x[!is.na(as.numeric(x))])})
 #print(IN)
+
 require(TopKLists)
 borda.res   <- Borda(IN)
+
+
 # l2norm
 TKSrank_l2norm   <- borda.res$TopK$l2norm
 TKSrank_l2norm   <- match(1:length(TKSrank_l2norm),as.numeric(TKSrank_l2norm))
