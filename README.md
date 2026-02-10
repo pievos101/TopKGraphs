@@ -49,7 +49,7 @@ g <- delete_vertices(g, V(g)[degree(g) == 0])
 ```r
 res <- topkgraphs(
   views = list(g),
-  walk_depth = 50,
+  walk_depth = 20,
   n_iter = 50
 )
 ```
