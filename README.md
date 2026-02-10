@@ -1,7 +1,5 @@
 # TopKGraphs
 
-# TopKGraphs
-
 **TopKGraphs** computes node affinities in graphs using multiple biased random walks, aggregates partial rankings via Borda counts, and produces a distance matrix suitable for clustering, visualization, or downstream analysis.
 
 ---

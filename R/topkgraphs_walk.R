@@ -147,7 +147,7 @@ borda.res = NaN
 
 if(do.BORDA){
 
-IN =  lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
+IN = lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
 IN = lapply(IN, function(x){as.numeric(x[!is.na(as.numeric(x))])})
 
 require(TopKLists)
