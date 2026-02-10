@@ -51,8 +51,10 @@ for(ii in 1:length(views)){
     adj_list <- lapply(V(graph), function(v) as.integer(neighbors(graph, v)))
 
 
-    WALKS = replicate(n_iter, walk_with_jaccard_degree_safe_cpp(adj_list,
-                      start_node=start_node, walk_depth= walk_depth))      
+    WALKS <- walk_with_jaccard_degree_safe_cpp(adj_list,
+                                           start_node = start_node,
+                                           walk_depth = walk_depth,
+                                           n_iter = n_iter)     
 
     WALKSALL[[ii]] = WALKS
 

@@ -1,12 +1,9 @@
 Package: TopKGraphs
 Type: Package
-Title: Jaccard-Biased Random Walks with Rank Aggregation 
-for Robust Node Affinities in Graphs
+Title: Jaccard-Biased Random Walks with Rank Aggregation for Robust Node Affinities in Graphs
 Version: 0.0.1
-Authors@R: person("Bastian", "Pfeifer", email = "bastian.pfeifer@medunigraz.at", 
-role = c("aut","cre"))
-Description: Provides the TopKGraphs algorithm for node similarity 
-in graphs based on random walks and ranking aggregation.
+Authors@R: person("Bastian", "Pfeifer", email = "bastian.pfeifer@medunigraz.at", role = c("aut","cre"))
+Description: Provides the TopKGraphs algorithm for node similarity in graphs based on random walks and ranking aggregation.
 License: GPL-3
 Imports: igraph, Rcpp, TopKLists, foreach, parallel
 LinkingTo: Rcpp
