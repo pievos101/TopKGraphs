@@ -97,40 +97,27 @@ for (xx in 1:ncol(WALKS)){
 
 rankMatrix = rankMatrix2 # cbind(rankMatrix1, rankMatrix2)
 
+##########################################################
 IS_NEEDED = FALSE # Not needed for Borda
 
 if(IS_NEEDED){
 #print(rankMatrix)
 
 # check missings
-#print("Walks")
-#print(start_node)
-#print(rankMatrix)
+
 values = unique(as.vector(rankMatrix))
-#print("Unique values")
-#print(values)
 na_ids = which(rankMatrix=="NaN", arr.ind=TRUE)
 na_cols = unique(na_ids[,2])
-#print(na_cols)
-#stop("Check")
+
 
 
 for(xx in 1:length(na_cols)){
 
    repl_val =  setdiff(values, rankMatrix[, na_cols[xx]])
-   #print(repl_val)
-
-   #print(rankMatrix[, na_cols[xx]])
-
-   #print("Replacers")
-   #print(repl_val)
+  
    if(length(repl_val)==0){next}
    repl_ids = which(rankMatrix[,na_cols[xx]]=="NaN")
    if(length(repl_ids)==0){next}
-   #print(repl_val)
-   #print("start")
-   #print(na_cols[xx])
-   #print(rankMatrix)
 
    if(length(repl_val)==1){
    repl_val_perm = repl_val 
@@ -138,18 +125,15 @@ for(xx in 1:length(na_cols)){
    repl_val_perm = sample(repl_val, length(repl_val), replace=FALSE) 
    }
 
-   #print(repl_val_perm)
-   
    #rankMatrix[repl_ids, na_cols[xx]] = repl_val_perm
    
    #xx = xx + length(repl_ids) - 1
-   #print("done")
-   #print("Updated Matrix")
-  # print(rankMatrix)
 
 }
 
 }# Not Needed for Borda!!!! 
+###################################################################
+
 
 ### check for remaining NaNs
 
@@ -189,16 +173,11 @@ borda.res = NaN
 
 if(do.BORDA){
 
-IN          <- lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
-#print(IN)
-#print(IN)
-
+IN =  lapply(seq_len(ncol(rankMatrix2)), function(i) rankMatrix2[,i])
 IN = lapply(IN, function(x){as.numeric(x[!is.na(as.numeric(x))])})
-#print(IN)
 
 require(TopKLists)
 borda.res   <- Borda(IN)
-
 
 # l2norm
 TKSrank_l2norm   <- borda.res$TopK$l2norm
@@ -216,19 +195,6 @@ TKSrank_geomean   <- match(1:length(TKSrank_geomean),as.numeric(TKSrank_geomean)
 # ---------------------------------------------- #
 
 }
-
-
-#rownames(rankMatrix2) = paste("p", 1:nrow(rankMatrix2), sep="")
-#colnames(rankMatrix2) = paste("r", 1:ncol(rankMatrix2), sep="")
-
-#estimatedSignal <- estimateTheta(R.input = rankMatrix2, 
-#                    num.boot = 100, b = 0.1, 
-#                    solver = "gurobi",
-#                    #type = "restrictedLinear", 
-#                    type = "restrictedQuadratic", 
-#                    bootstrap.type = "classic.bootstrap",
-#                    nCore = 3)
-
 
 
 #TKSrank_topksignal = rank(-estimatedSignal$estimation$signal.estimate)
