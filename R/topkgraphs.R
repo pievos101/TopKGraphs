@@ -19,9 +19,20 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
  do.TopKSignal = FALSE
  do.RRA = FALSE
  
+
+ ##############################################
+ # Precompute adjacency list
+ ##############################################
+ adj_list = list()
+ for(xx in 1:length(views)){
+   graph = views[[xx]]
+   adj_list[[xx]] = lapply(V(graph), 
+                        function(v) as.integer(neighbors(graph, v)))
+ }
+ ###############################################
+
  RES = list()
  
-
  if(!(is(views[[1]])[1]=="igraph")){
     n_nodes = nrow(views[[1]])
  }else{
@@ -34,6 +45,7 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
     for(xx in 1:n_nodes){
 
         RES[[xx]] = topkgraphs_walk(views, 
+                                adj_list = adj_list,
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
                                 n_iter=n_iter)
@@ -52,7 +64,7 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
     
     RES = foreach(xx = 1:n_nodes, .combine = c, 
       .packages = c("igraph","TopKLists")) %dopar% {
-        list(topkgraphs_walk(views, start_node=xx, 
+        list(topkgraphs_walk(views, adj_list = adj_list, start_node=xx, 
         walk_depth=walk_depth, n_iter=n_iter))
          }
 

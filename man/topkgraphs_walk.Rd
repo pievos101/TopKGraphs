@@ -4,10 +4,12 @@
 \alias{topkgraphs_walk}
 \title{Jaccard-Anchored Random Walk Ranking}
 \usage{
-topkgraphs_walk(views, start_node = 1, walk_depth = 20, n_iter = 20)
+topkgraphs_walk(views, adj_list, start_node = 1, walk_depth = 20, n_iter = 20)
 }
 \arguments{
 \item{views}{List of igraph objects or adjacency matrices}
+
+\item{adj_list}{Adjaceny list of each graph}
 
 \item{start_node}{Integer start node}
 

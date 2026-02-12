@@ -10,21 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// walk_with_jaccard_fast
-IntegerMatrix walk_with_jaccard_fast(List adj_list, int start_node, int walk_depth, int n_iter, double eps);
-RcppExport SEXP _TopKGraphs_walk_with_jaccard_fast(SEXP adj_listSEXP, SEXP start_nodeSEXP, SEXP walk_depthSEXP, SEXP n_iterSEXP, SEXP epsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type adj_list(adj_listSEXP);
-    Rcpp::traits::input_parameter< int >::type start_node(start_nodeSEXP);
-    Rcpp::traits::input_parameter< int >::type walk_depth(walk_depthSEXP);
-    Rcpp::traits::input_parameter< int >::type n_iter(n_iterSEXP);
-    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
-    rcpp_result_gen = Rcpp::wrap(walk_with_jaccard_fast(adj_list, start_node, walk_depth, n_iter, eps));
-    return rcpp_result_gen;
-END_RCPP
-}
 // walk_with_jaccard_degree_safe_cpp
 IntegerMatrix walk_with_jaccard_degree_safe_cpp(List adj_list, int start_node, int walk_depth, int n_iter, double eps);
 RcppExport SEXP _TopKGraphs_walk_with_jaccard_degree_safe_cpp(SEXP adj_listSEXP, SEXP start_nodeSEXP, SEXP walk_depthSEXP, SEXP n_iterSEXP, SEXP epsSEXP) {
@@ -40,25 +25,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// walk_with_jaccard_degree_safe_cpp_old
-IntegerVector walk_with_jaccard_degree_safe_cpp_old(List adj_list, int start_node, int walk_depth, double eps);
-RcppExport SEXP _TopKGraphs_walk_with_jaccard_degree_safe_cpp_old(SEXP adj_listSEXP, SEXP start_nodeSEXP, SEXP walk_depthSEXP, SEXP epsSEXP) {
+// stationary_jaccard_walk_cpp
+NumericVector stationary_jaccard_walk_cpp(List adj_list, int start_node, int max_iter, double tol, double eps);
+RcppExport SEXP _TopKGraphs_stationary_jaccard_walk_cpp(SEXP adj_listSEXP, SEXP start_nodeSEXP, SEXP max_iterSEXP, SEXP tolSEXP, SEXP epsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type adj_list(adj_listSEXP);
     Rcpp::traits::input_parameter< int >::type start_node(start_nodeSEXP);
-    Rcpp::traits::input_parameter< int >::type walk_depth(walk_depthSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iter(max_iterSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
-    rcpp_result_gen = Rcpp::wrap(walk_with_jaccard_degree_safe_cpp_old(adj_list, start_node, walk_depth, eps));
+    rcpp_result_gen = Rcpp::wrap(stationary_jaccard_walk_cpp(adj_list, start_node, max_iter, tol, eps));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_TopKGraphs_walk_with_jaccard_fast", (DL_FUNC) &_TopKGraphs_walk_with_jaccard_fast, 5},
     {"_TopKGraphs_walk_with_jaccard_degree_safe_cpp", (DL_FUNC) &_TopKGraphs_walk_with_jaccard_degree_safe_cpp, 5},
-    {"_TopKGraphs_walk_with_jaccard_degree_safe_cpp_old", (DL_FUNC) &_TopKGraphs_walk_with_jaccard_degree_safe_cpp_old, 4},
+    {"_TopKGraphs_stationary_jaccard_walk_cpp", (DL_FUNC) &_TopKGraphs_stationary_jaccard_walk_cpp, 5},
     {NULL, NULL, 0}
 };
 

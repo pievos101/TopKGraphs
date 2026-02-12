@@ -4,6 +4,7 @@
 #' the resulting partial rankings.
 #'
 #' @param views List of igraph objects or adjacency matrices
+#' @param adj_list Adjaceny list of each graph
 #' @param start_node Integer start node
 #' @param walk_depth Length of each walk
 #' @param n_iter Number of walks
@@ -13,6 +14,7 @@
 #' @export
 
 topkgraphs_walk <- function(views, 
+                            adj_list, 
                             start_node=1, 
                             walk_depth=20, 
                             n_iter=20 
@@ -48,10 +50,10 @@ for(ii in 1:length(views)){
     WALKS = matrix(NaN, walk_depth + 1, n_iter)
     
     # Precompute adjacency list
-    adj_list <- lapply(V(graph), function(v) as.integer(neighbors(graph, v)))
+    #adj_list <- lapply(V(graph), function(v) as.integer(neighbors(graph, v)))
 
 
-    WALKS <- walk_with_jaccard_degree_safe_cpp(adj_list,
+    WALKS <- walk_with_jaccard_degree_safe_cpp(adj_list[[ii]],
                                            start_node = start_node,
                                            walk_depth = walk_depth,
                                            n_iter = n_iter)     
