@@ -4,7 +4,7 @@
 #' the resulting partial rankings.
 #'
 #' @param views List of igraph objects or adjacency matrices
-#' @param adj_list Adjaceny list of each graph
+#' @param adj_list Adjacency list of each graph
 #' @param start_node Integer start node
 #' @param walk_depth Length of each walk
 #' @param n_iter Number of walks
