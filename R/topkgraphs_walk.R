@@ -191,9 +191,9 @@ if(do.TopKSignal){
   colnames(IN) = paste("r",1:ncol(rankMatrix_tks), sep="")
   
   # remove the start_node
-  id = match(start_node, node_names)
-  IN = IN[-id,]
-  IN = IN - 1
+  #id = match(start_node, node_names)
+  #IN = IN[-id,]
+  #IN = IN - 1
 
   #print(IN)
 
@@ -201,7 +201,7 @@ if(do.TopKSignal){
   require(gurobi)
 
   estimatedSignal <- estimateTheta(R.input = IN, 
-          num.boot = 50, b = 0.1, solver = "gurobi", 
+          num.boot = 100, b = 0.1, solver = "gurobi", 
           type = "restrictedQuadratic", bootstrap.type = "classic.bootstrap",
           nCore = 5)
 

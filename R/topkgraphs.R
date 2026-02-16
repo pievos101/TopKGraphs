@@ -107,7 +107,9 @@ for (xx in 1:length(RES)){
       }
 
    if(do.TopKSignal){
-         DIST[xx, as.numeric(RES[[xx]]$TS$id)] = -RES[[xx]]$TS$signal.estimate
+         x = RES[[xx]]$TS$signal.estimate
+         DIST[xx, as.numeric(RES[[xx]]$TS$id)] = x #1 - (x - min(x))/(max(x)-min(x))
+         
    }
 
    if(do.RRA){
@@ -126,7 +128,7 @@ if(do.TopKSignal){
 #DIST <- 1 - (DIST - min(DIST, na.rm=TRUE)) / 
 #(max(DIST, na.rm=TRUE) - min(DIST, na.rm=TRUE))
 #DIST[DIST<0] = 0
-#DIST = 1 - DIST/max(DIST, na.rm=TRUE)
+DIST = 1 - (DIST + max(DIST, na.rm=TRUE))/max(DIST, na.rm=TRUE)
 }
 
 if(do.RRA){
