@@ -189,6 +189,12 @@ if(do.TopKSignal){
   IN = apply(rankMatrix_tks, 2, function(x){match(node_names,x)})
   rownames(IN) = node_names
   colnames(IN) = paste("r",1:ncol(rankMatrix_tks), sep="")
+  
+  # remove the start_node
+  id = match(start_node, node_names)
+  IN = IN[-id,]
+  IN = IN - 1
+
   #print(IN)
 
   require(TopKSignal)

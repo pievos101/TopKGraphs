@@ -107,7 +107,7 @@ for (xx in 1:length(RES)){
       }
 
    if(do.TopKSignal){
-         DIST[xx, as.numeric(RES[[xx]]$TS$id)] = (-RES[[xx]]$TS$signal.estimate)
+         DIST[xx, as.numeric(RES[[xx]]$TS$id)] = -RES[[xx]]$TS$signal.estimate
    }
 
    if(do.RRA){
