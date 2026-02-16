@@ -107,8 +107,7 @@ for (xx in 1:length(RES)){
       }
 
    if(do.TopKSignal){
-         DIST[xx, as.numeric(RES[[xx]]$TS$id)] = 
-         1 / (1 + exp(RES[[xx]]$TS$signal.estimate))
+         DIST[xx, as.numeric(RES[[xx]]$TS$id)] = (-RES[[xx]]$TS$signal.estimate)
    }
 
    if(do.RRA){
@@ -124,6 +123,8 @@ if(do.BORDA){
 }
 
 if(do.TopKSignal){
+#DIST <- 1 - (DIST - min(DIST, na.rm=TRUE)) / 
+#(max(DIST, na.rm=TRUE) - min(DIST, na.rm=TRUE))
 #DIST[DIST<0] = 0
 #DIST = 1 - DIST/max(DIST, na.rm=TRUE)
 }
@@ -132,12 +133,13 @@ if(do.RRA){
 DIST = DIST/max(DIST, na.rm=TRUE)
 }
 
-DIST[is.na(DIST)] <- max(DIST, na.rm=TRUE)
-diag(DIST) <- 0
-DIST_raw <- (DIST + t(DIST)) / 2  # symmetrize
 
-coords <- cmdscale(as.dist(DIST_raw), k=10)  # 10D embedding
-DIST <- as.matrix(dist(coords))
+DIST[is.na(DIST)] <- max(DIST, na.rm=TRUE)
+diag(DIST) = 0
+DIST_raw = (DIST + t(DIST)) / 2  # symmetrize
+coords = cmdscale(as.dist(DIST_raw), k=10)  # 10D embedding
+DIST = as.matrix(dist(coords))
+
 
 return(list(RES=RES, DIST=DIST, DIST_raw=DIST_raw))
 

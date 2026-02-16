@@ -108,7 +108,7 @@ values = unique(as.vector(rankMatrix))
 na_ids = which(rankMatrix=="NaN", arr.ind=TRUE)
 na_cols = unique(na_ids[,2])
 
-
+#print(rankMatrix_tks)
 for(xx in 1:length(na_cols)){
 
    repl_val =  setdiff(values, rankMatrix[, na_cols[xx]])
@@ -128,7 +128,7 @@ for(xx in 1:length(na_cols)){
    #xx = xx + length(repl_ids) - 1
 
 }
-
+#print(rankMatrix_tks)
 }# Not Needed for Borda!!!! 
 ###################################################################
 ###################################################################
@@ -185,11 +185,11 @@ TKSrank_geomean   <- match(1:length(TKSrank_geomean),as.numeric(TKSrank_geomean)
 latent_signal = NaN
 if(do.TopKSignal){
 
-
   node_names = sort(unique(as.vector(rankMatrix_tks)))
   IN = apply(rankMatrix_tks, 2, function(x){match(node_names,x)})
   rownames(IN) = node_names
   colnames(IN) = paste("r",1:ncol(rankMatrix_tks), sep="")
+  #print(IN)
 
   require(TopKSignal)
   require(gurobi)
@@ -200,6 +200,8 @@ if(do.TopKSignal){
           nCore = 5)
 
   latent_signal = estimatedSignal$estimation
+  #print("Consensus")
+  #print(latent_signal)
 
 }
 
