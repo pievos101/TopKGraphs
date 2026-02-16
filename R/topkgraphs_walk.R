@@ -8,6 +8,7 @@
 #' @param start_node Integer start node
 #' @param walk_depth Length of each walk
 #' @param n_iter Number of walks
+#' @param do.TopKSignal TopKSignal
 #'
 #' @return A list containing aggregated rankings and scores
 #'
@@ -17,14 +18,19 @@ topkgraphs_walk <- function(views,
                             adj_list, 
                             start_node=1, 
                             walk_depth=20, 
-                            n_iter=20 
+                            n_iter=20, 
+                            do.TopKSignal=FALSE 
                             ){
 
 
 
 do.BORDA = TRUE
-do.TopKSignal = FALSE
+if(do.TopKSignal){
+    do.BORDA = FALSE
+}
+
 do.RRA = FALSE
+
 alpha=0
 
 WALKSALL = list()
@@ -91,10 +97,11 @@ rankMatrix = rankMatrix2 # cbind(rankMatrix1, rankMatrix2)
 
 ##############################################################
 ##############################################################
-IS_NEEDED = FALSE # Not needed for Borda!!!
+#IS_NEEDED = FALSE # Not needed for Borda!!!
 
-if(IS_NEEDED){
+if(do.TopKSignal){
 
+rankMatrix_tks = rankMatrix #matrix(NaN, n_nodes2, ncol(WALKS))
 # check missings
 
 values = unique(as.vector(rankMatrix))
@@ -116,7 +123,7 @@ for(xx in 1:length(na_cols)){
    repl_val_perm = sample(repl_val, length(repl_val), replace=FALSE) 
    }
 
-   #rankMatrix[repl_ids, na_cols[xx]] = repl_val_perm
+   rankMatrix_tks[repl_ids, na_cols[xx]] = repl_val_perm
    
    #xx = xx + length(repl_ids) - 1
 
@@ -179,11 +186,10 @@ latent_signal = NaN
 if(do.TopKSignal){
 
 
-  node_names = sort(unique(as.vector(rankMatrix2)))
-  IN = apply(rankMatrix2, 2, function(x){match(node_names,x)})
+  node_names = sort(unique(as.vector(rankMatrix_tks)))
+  IN = apply(rankMatrix_tks, 2, function(x){match(node_names,x)})
   rownames(IN) = node_names
-  colnames(IN) = paste("r",1:ncol(rankMatrix2), sep="")
-
+  colnames(IN) = paste("r",1:ncol(rankMatrix_tks), sep="")
 
   require(TopKSignal)
   require(gurobi)

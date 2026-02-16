@@ -6,18 +6,25 @@
 #' @param walk_depth Integer walk length
 #' @param n_iter Number of walks
 #' @param n_cores Number of cores (NA = serial)
-#' @param agg_method Aggregation method
+#' @param agg_method Aggregation method (for BORDA)
+#' @param do.TopKSignal Use TopKSignal 
 #' @return List with RES, DIST, DIST_raw
 #'
 #' @export
 
 
 topkgraphs <- function(views, walk_depth=50, n_iter=50, 
-                                 n_cores=NaN, agg_method="mean"){
+                                 n_cores=NaN, agg_method="mean",
+                                 do.TopKSignal=FALSE){
 
- do.BORDA = TRUE
- do.TopKSignal = FALSE
- do.RRA = FALSE
+ 
+do.BORDA = TRUE
+if(do.TopKSignal){
+    do.BORDA = FALSE
+}
+
+
+do.RRA = FALSE
  
 
  ##############################################
@@ -48,7 +55,8 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
                                 adj_list = adj_list,
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
-                                n_iter=n_iter)
+                                n_iter=n_iter, 
+                                do.TopKSignal=do.TopKSignal)
     }
  }else{ # parallel computation
  
@@ -65,7 +73,7 @@ topkgraphs <- function(views, walk_depth=50, n_iter=50,
     RES = foreach(xx = 1:n_nodes, .combine = c, 
       .packages = c("igraph","TopKLists")) %dopar% {
         list(topkgraphs_walk(views, adj_list = adj_list, start_node=xx, 
-        walk_depth=walk_depth, n_iter=n_iter))
+        walk_depth=walk_depth, n_iter=n_iter, do.TopKSignal=do.TopKSignal))
          }
 
     stopCluster(cl)
@@ -100,7 +108,7 @@ for (xx in 1:length(RES)){
 
    if(do.TopKSignal){
          DIST[xx, as.numeric(RES[[xx]]$TS$id)] = 
-         1 / (1 + exp(-RES[[xx]]$TS$signal.estimate))
+         1 / (1 + exp(RES[[xx]]$TS$signal.estimate))
    }
 
    if(do.RRA){
@@ -116,8 +124,8 @@ if(do.BORDA){
 }
 
 if(do.TopKSignal){
-DIST[DIST<0] = 0
-DIST = 1 - DIST/max(DIST, na.rm=TRUE)
+#DIST[DIST<0] = 0
+#DIST = 1 - DIST/max(DIST, na.rm=TRUE)
 }
 
 if(do.RRA){
