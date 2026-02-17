@@ -80,7 +80,7 @@ cat("Jaccard:   ", round(ari_jaccard, 3), "\n")
 You can visualize the graph embeddings derived from TopKGraphs:
 
 ```r
-coords <- cmdscale(as.dist(res$DIST_raw), k = 2)
+coords <- cmdscale(as.dist(res$DIST), k = 2)
 plot(coords, col = V(g)$community, pch = 19,
      main = "2D Embedding from TopKGraphs Distances")
 ```

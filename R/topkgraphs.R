@@ -144,7 +144,7 @@ coords = cmdscale(as.dist(DIST_raw), k=10)  # 10D embedding
 DIST = as.matrix(dist(coords))
 
 
-return(list(RES=RES, DIST=DIST, DIST_raw=DIST_raw))
+return(list(RES=RES, DIST=DIST_raw, DIST_emb=DIST))
 
 }
 
