@@ -128,7 +128,8 @@ if(do.TopKSignal){
 #DIST <- 1 - (DIST - min(DIST, na.rm=TRUE)) / 
 #(max(DIST, na.rm=TRUE) - min(DIST, na.rm=TRUE))
 #DIST[DIST<0] = 0
-DIST = 1 - (DIST + max(DIST, na.rm=TRUE))/max(DIST, na.rm=TRUE)
+DIST[is.na(DIST)] <- max(DIST, na.rm=TRUE)
+DIST = 1 - cor(t(DIST), method="spearman")
 }
 
 if(do.RRA){
