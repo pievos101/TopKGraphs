@@ -87,7 +87,7 @@ plot(coords, col = V(g)$community, pch = 19,
 
 ## Citation
 
-If you use this project in your research, please cite it as:
+If you use this method in your research, please cite it as:
 
 ```bibtex
 
