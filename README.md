@@ -84,3 +84,21 @@ coords <- cmdscale(as.dist(res$DIST), k = 2)
 plot(coords, col = V(g)$community, pch = 19,
      main = "2D Embedding from TopKGraphs Distances")
 ```
+
+## Citation
+
+If you use this project in your research, please cite it as:
+
+```bibtex
+
+@misc{pfeifer2026robustnodeaffinitiesjaccardbiased,
+      title={Robust Node Affinities via Jaccard-Biased Random Walks and Rank Aggregation}, 
+      author={Bastian Pfeifer and Michael G. Schimek},
+      year={2026},
+      eprint={2603.05375},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2603.05375}, 
+}
+
+```
