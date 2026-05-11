@@ -10,7 +10,7 @@
 
 build_temporal_graph <- function(wide, k_similarity = 10) {
 
-  require(igraph)
+  library(igraph)
   wide <- as.data.frame(wide)
 
   # -------------------------------------------------
