@@ -2,5 +2,6 @@
 
 export(topkgraphs)
 export(topkgraphs_walk)
+export(build_temporal_graph)
 importFrom(Rcpp,sourceCpp)
 useDynLib(TopKGraphs, .registration = TRUE)
