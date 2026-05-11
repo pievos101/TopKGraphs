@@ -164,6 +164,11 @@ build_temporal_graph <- function(wide, k_similarity = 10) {
     )
   }
 
+## INFO
+#V(g)$name
+#V(g)$subject
+#V(g)$time
+
   return(list(
     graph = g,
     patient_labels = patient_labels,
