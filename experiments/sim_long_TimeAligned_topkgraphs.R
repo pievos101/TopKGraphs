@@ -14,7 +14,7 @@ colnames(RES) = c("longTAPIO_trajectories_PC1","longTAPIO_trajectories_PCwr",
 
 for(ii in 1:n_iter){
 
-    r_eta = 5 #sample(1:10,1)
+    r_eta = 3 #sample(1:10,1)
     r_sigma_diag = rep(3,5) #sample(1:6, 5, replace=TRUE)
     id = sample(1:5, 1)
     r_sigma_diag[id] =  sample(3:20, 1)
@@ -74,9 +74,12 @@ for(ii in 1:n_iter){
 
     # longTopKGraphs
     print("longTopKGraphs")
-    temp_g = TopKGraphs::build_temporal_graph(Longdat2_wide,5)
+    temp_g = TopKGraphs::build_temporal_graph(Longdat2_wide, 10)
     g = temp_g$g
-    res = TopKGraphs::topkgraphs(list(g), n_cores=1)
+    res = TopKGraphs::topkgraphs(list(g), 
+                                    walk_depth=100, 
+                                    n_iter=50, 
+                                    n_cores=1)
     DIST = res$DIST
 
     # Convert to subject-specific
@@ -91,7 +94,7 @@ for(ii in 1:n_iter){
     subjects <- names(nodes_by_subject)
 
     # ---------------------------------------------------------
-    # STEP 3 — Initialize subject similarity matrix
+    # STEP 3 — Initialize subject distance matrix
     # ---------------------------------------------------------
 
     n_subj <- length(subjects)
