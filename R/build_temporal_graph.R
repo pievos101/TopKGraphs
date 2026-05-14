@@ -8,53 +8,60 @@
 #'
 #' @export
 
-build_temporal_graph <- function(wide, k_similarity = 10) {
+build_temporal_graph <- function(wide, k_similarity = 10, n_subspaces = 5, subspace_ratio = 0.7) {
 
   library(igraph)
+
   wide <- as.data.frame(wide)
 
   # -------------------------------------------------
   # STEP 1 — feature matrix
   # -------------------------------------------------
   feature_cols <- grep("^y\\.", names(wide), value = TRUE)
+  X_raw <- as.matrix(wide[, feature_cols])
 
-  X <- as.matrix(wide[, feature_cols])
+  # -------------------------------------------------
+  # STEP 1.1 — ROBUST FEATURE NORMALIZATION
+  # (critical: removes scale sensitivity + reduces noise impact)
+  # -------------------------------------------------
+  X <- scale(X_raw)
+
+  # clip extreme values (winsorization)
+  clip_val <- 4
+  X[X > clip_val] <- clip_val
+  X[X < -clip_val] <- -clip_val
+
+  n <- nrow(X)
 
   # -------------------------------------------------
   # STEP 2 — stable node ids
   # -------------------------------------------------
-  wide$node_id <- seq_len(nrow(wide)) - 1
+  wide$node_id <- seq_len(n) - 1
 
   # -------------------------------------------------
   # STEP 3 — patient-level labels
   # -------------------------------------------------
   patient_labels <- unique(wide[, c("subject", "cluster")])
-
-  patient_labels <- patient_labels[
-    order(patient_labels$subject),
-  ]
+  patient_labels <- patient_labels[order(patient_labels$subject), ]
 
   # -------------------------------------------------
-  # STEP 4 — create graph + nodes
+  # STEP 4 — create graph
   # -------------------------------------------------
   g <- make_empty_graph(directed = FALSE)
 
   g <- add_vertices(
     g,
-    nv = nrow(wide),
+    nv = n,
     name = as.character(wide$node_id),
     subject = wide$subject,
     time = wide$time,
     cluster = wide$cluster
   )
 
-  # feature vectors as vertex attributes
-  V(g)$features <- lapply(seq_len(nrow(X)), function(i) {
-    as.numeric(X[i, ])
-  })
+  V(g)$features <- lapply(seq_len(n), function(i) as.numeric(X[i, ]))
 
   # -------------------------------------------------
-  # STEP 5 — temporal edges
+  # STEP 5 — temporal edges (UNCHANGED)
   # -------------------------------------------------
   temporal_edges <- c()
   temporal_types <- c()
@@ -66,109 +73,86 @@ build_temporal_graph <- function(wide, k_similarity = 10) {
     sub <- wide[wide$subject == s, ]
     sub <- sub[order(sub$time), ]
 
-    if (nrow(sub) < 2)
-      next
+    if (nrow(sub) < 2) next
 
     for (i in 1:(nrow(sub) - 1)) {
 
-      from <- as.character(sub$node_id[i])
-      to   <- as.character(sub$node_id[i + 1])
-
       temporal_edges <- c(
         temporal_edges,
-        from,
-        to
+        as.character(sub$node_id[i]),
+        as.character(sub$node_id[i + 1])
       )
 
-      temporal_types <- c(
-        temporal_types,
-        "temporal"
-      )
+      temporal_types <- c(temporal_types, "temporal")
     }
   }
 
   if (length(temporal_edges) > 0) {
-
-    g <- add_edges(
-      g,
-      temporal_edges,
-      attr = list(
-        edge_type = temporal_types
-      )
-    )
+    g <- add_edges(g, temporal_edges, attr = list(edge_type = temporal_types))
   }
 
   # -------------------------------------------------
-  # STEP 6 — similarity edges within time slices
+  # STEP 6 — ROBUST kNN SIMILARITY GRAPH
   # -------------------------------------------------
   similarity_edges <- c()
   similarity_types <- c()
-  similarity_times <- c()
+
+  p <- ncol(X)
+  subspace_size <- max(2, floor(subspace_ratio * p))
 
   unique_times <- sort(unique(wide$time))
 
   for (t in unique_times) {
 
-    slice_idx <- which(wide$time == t)
+    idx <- which(wide$time == t)
 
-    if (length(slice_idx) <= k_similarity)
-      next
+    if (length(idx) <= k_similarity) next
 
-    X_slice <- X[slice_idx, , drop = FALSE]
+    X_slice <- X[idx, , drop = FALSE]
 
-    # pairwise Euclidean distances
-    dist_mat <- as.matrix(dist(X_slice))
+    # -------------------------------------------------
+    # ENSEMBLE kNN (KEY FIX)
+    # -------------------------------------------------
+    agg_dist <- matrix(0, nrow = nrow(X_slice), ncol = nrow(X_slice))
 
-    for (i_local in seq_along(slice_idx)) {
+    for (b in 1:n_subspaces) {
 
-      i_global <- slice_idx[i_local]
+      feat_idx <- sample(1:p, subspace_size, replace = FALSE)
+      X_sub <- X_slice[, feat_idx, drop = FALSE]
 
-      # nearest neighbors excluding self
-      neighbors <- order(dist_mat[i_local, ])[2:(k_similarity + 1)]
+      d <- as.matrix(dist(X_sub))
+      agg_dist <- agg_dist + rank(d)
+    }
 
-      for (j_local in neighbors) {
+    agg_dist <- agg_dist / n_subspaces
 
-        j_global <- slice_idx[j_local]
+    # -------------------------------------------------
+    # kNN from aggregated ranks (robust to noise dims)
+    # -------------------------------------------------
+    for (i in 1:nrow(agg_dist)) {
 
-        from <- as.character(wide$node_id[i_global])
-        to   <- as.character(wide$node_id[j_global])
+      neighbors <- order(agg_dist[i, ])[2:(k_similarity + 1)]
+
+      for (j in neighbors) {
 
         similarity_edges <- c(
           similarity_edges,
-          from,
-          to
+          as.character(wide$node_id[idx[i]]),
+          as.character(wide$node_id[idx[j]])
         )
 
-        similarity_types <- c(
-          similarity_types,
-          "similarity"
-        )
-
-        similarity_times <- c(
-          similarity_times,
-          t
-        )
+        similarity_types <- c(similarity_types, "similarity")
       }
     }
   }
 
   if (length(similarity_edges) > 0) {
-
-    g <- add_edges(
-      g,
-      similarity_edges,
-      attr = list(
-        edge_type = similarity_types,
-        time = similarity_times
-      )
-    )
+    g <- add_edges(g, similarity_edges, attr = list(edge_type = similarity_types))
   }
 
-## INFO
-#V(g)$name
-#V(g)$subject
-#V(g)$time
-
+  # -------------------------------------------------
+  # RETURN
+  # -------------------------------------------------
   return(list(
     graph = g,
     patient_labels = patient_labels,
