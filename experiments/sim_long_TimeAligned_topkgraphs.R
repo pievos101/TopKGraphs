@@ -15,9 +15,10 @@ colnames(RES) = c("longTAPIO_trajectories_PC1","longTAPIO_trajectories_PCwr",
 for(ii in 1:n_iter){
 
     r_eta = 3 #sample(1:10,1)
-    r_sigma_diag = rep(3,5) #sample(1:6, 5, replace=TRUE)
-    id = sample(1:5, 1)
-    r_sigma_diag[id] =  sample(3:20, 1)
+    r_sigma_diag = rep(5, 5) #sample(1:6, 5, replace=TRUE)
+    #r_sigma_diag = sample(3:10, 5, replace=TRUE)
+    #id = sample(1:5, 1)
+    #r_sigma_diag[id] =  sample(3:20, 1)
 
     print(ii)
     print(r_sigma_diag)
@@ -41,7 +42,7 @@ for(ii in 1:n_iter){
     
     ## Params
     set_levels = 4
-    set_n_features = 5
+    set_n_features = NaN
 
 
     # longTAPIO_trajectories (first PCA)
