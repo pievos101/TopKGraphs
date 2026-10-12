@@ -8,6 +8,7 @@
 #' @param start_node Integer start node
 #' @param walk_depth Length of each walk
 #' @param n_iter Number of walks
+#' @param eps epsilon
 #' @param do.TopKSignal TopKSignal
 #'
 #' @return A list containing aggregated rankings and scores
@@ -18,7 +19,8 @@ topkgraphs_walk <- function(views,
                             adj_list, 
                             start_node=1, 
                             walk_depth=20, 
-                            n_iter=20, 
+                            n_iter=20,
+                            eps = 1e-3, 
                             do.TopKSignal=FALSE 
                             ){
 
@@ -62,7 +64,8 @@ for(ii in 1:length(views)){
     WALKS <- walk_with_jaccard_degree_safe_cpp(adj_list[[ii]],
                                            start_node = start_node,
                                            walk_depth = walk_depth,
-                                           n_iter = n_iter)     
+                                           n_iter = n_iter, 
+                                           eps = eps)     
 
     WALKSALL[[ii]] = WALKS
 

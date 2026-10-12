@@ -5,6 +5,7 @@
 #' @param views List of graphs or adjacency matrices
 #' @param walk_depth Integer walk length
 #' @param n_iter Number of walks
+#' @param eps epsilon
 #' @param n_cores Number of cores (NA = serial)
 #' @param agg_method Aggregation method (for BORDA)
 #' @param do.TopKSignal Use TopKSignal 
@@ -13,7 +14,7 @@
 #' @export
 
 
-topkgraphs <- function(views, walk_depth=50, n_iter=50, 
+topkgraphs <- function(views, walk_depth=50, n_iter=50, eps = 1e-3,
                                  n_cores=NaN, agg_method="mean",
                                  do.TopKSignal=FALSE){
 
@@ -56,6 +57,7 @@ do.RRA = FALSE
                                 start_node=xx, 
                                 walk_depth=walk_depth, 
                                 n_iter=n_iter, 
+                                eps = eps, 
                                 do.TopKSignal=do.TopKSignal)
     }
  }else{ # parallel computation
@@ -73,7 +75,7 @@ do.RRA = FALSE
     RES = foreach(xx = 1:n_nodes, .combine = c, 
       .packages = c("igraph","TopKLists")) %dopar% {
         list(topkgraphs_walk(views, adj_list = adj_list, start_node=xx, 
-        walk_depth=walk_depth, n_iter=n_iter, do.TopKSignal=do.TopKSignal))
+        walk_depth=walk_depth, n_iter=n_iter, eps=eps, do.TopKSignal=do.TopKSignal))
          }
 
     stopCluster(cl)
