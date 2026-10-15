@@ -8,6 +8,7 @@
 #' @param eps epsilon
 #' @param n_cores Number of cores (NA = serial)
 #' @param agg_method Aggregation method (for BORDA)
+#' @param embedding Compute Embeddings via MDS
 #' @param do.TopKSignal Use TopKSignal 
 #' @return List with RES, DIST, DIST_raw
 #'
@@ -16,7 +17,7 @@
 
 topkgraphs <- function(views, walk_depth=50, n_iter=50, eps = 1e-3,
                                  n_cores=NaN, agg_method="mean", 
-                                 cmdscale=FALSE,
+                                 embedding=FALSE,
                                  do.TopKSignal=FALSE){
 
  
@@ -144,7 +145,7 @@ DIST[is.na(DIST)] <- max(DIST, na.rm=TRUE)
 diag(DIST) = 0
 DIST_raw = (DIST + t(DIST)) / 2  # symmetrize
 
-if(cmdscale){
+if(embedding){
    coords = cmdscale(as.dist(DIST_raw), k=10)  # 10D embedding
    DIST = as.matrix(dist(coords))
 }else{

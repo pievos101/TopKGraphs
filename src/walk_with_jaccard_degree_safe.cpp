@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-IntegerMatrix walk_with_jaccard_degree_safe_cpp(
+IntegerMatrix walk_with_jaccard_degree_safe_cpp_fast(
     List adj_list,
     int start_node,
     int walk_depth = 20,
@@ -247,7 +247,7 @@ IntegerMatrix walk_with_jaccard_degree_safe_cpp(
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-IntegerMatrix walk_with_jaccard_degree_safe_cpp_old(
+IntegerMatrix walk_with_jaccard_degree_safe_cpp(
     List adj_list,
     int start_node,
     int walk_depth = 20,  
