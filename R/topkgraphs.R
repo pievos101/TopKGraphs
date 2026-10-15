@@ -15,7 +15,8 @@
 
 
 topkgraphs <- function(views, walk_depth=50, n_iter=50, eps = 1e-3,
-                                 n_cores=NaN, agg_method="mean",
+                                 n_cores=NaN, agg_method="mean", 
+                                 cmdscale=FALSE,
                                  do.TopKSignal=FALSE){
 
  
@@ -142,9 +143,13 @@ DIST = DIST/max(DIST, na.rm=TRUE)
 DIST[is.na(DIST)] <- max(DIST, na.rm=TRUE)
 diag(DIST) = 0
 DIST_raw = (DIST + t(DIST)) / 2  # symmetrize
-coords = cmdscale(as.dist(DIST_raw), k=10)  # 10D embedding
-DIST = as.matrix(dist(coords))
 
+if(cmdscale){
+   coords = cmdscale(as.dist(DIST_raw), k=10)  # 10D embedding
+   DIST = as.matrix(dist(coords))
+}else{
+   DIST = NULL
+}
 
 return(list(RES=RES, DIST=DIST_raw, DIST_emb=DIST))
 
