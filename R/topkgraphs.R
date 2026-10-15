@@ -65,7 +65,7 @@ do.RRA = FALSE
     require(foreach)
     require(doParallel)
 
-    ncores <- parallel::detectCores() - 2
+    ncores <- n_cores #parallel::detectCores() - 2
     cl <- makeCluster(ncores)
 
     # Register the cluster
